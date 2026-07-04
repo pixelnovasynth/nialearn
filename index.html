@@ -438,6 +438,73 @@
             font-weight: 600;
         }
 
+        /* Vertical List Buttons (Age Pick, Home Levels, Topic List) */
+        .list-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 40px;
+            width: 100%;
+        }
+
+        .list-btn {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 3px solid transparent;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .list-btn:hover {
+            transform: translateX(4px);
+        }
+
+        .list-btn:active {
+            transform: scale(0.97);
+        }
+
+        .list-btn-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .list-btn-text {
+            flex: 1;
+        }
+
+        .list-btn-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .list-btn-caption {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .list-btn-arrow {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            flex-shrink: 0;
+        }
+
         /* Math equation flashcards need a smaller hero font to avoid overflow */
         .flashcard-emoji.fc-equation {
             font-size: 4rem;
@@ -806,6 +873,9 @@
             <button class="btn-pill" onclick="app.toggleLanguage()">
                 <span id="lang-flag">🇬🇧</span> <span id="lang-text">EN</span>
             </button>
+            <button class="btn-icon" onclick="app.navigateTo('agepick')" title="Change Age Group" style="background: var(--blue);">
+                🎂
+            </button>
             <button class="btn-icon" id="settings-btn" title="Parent Settings" style="background: var(--pink);">
                 ⚙️
             </button>
@@ -820,22 +890,31 @@
             </div>
         </div>
 
-        <div class="category-grid">
-            <div class="cat-card" style="background: var(--green);" onclick="app.selectAgeBand('2-3')">
-                <div class="cat-icon">🌱</div>
-                <div class="cat-title">2–3 Years</div>
-                <div class="agepick-caption">Just Getting Started? 🌱</div>
-            </div>
-            <div class="cat-card" style="background: var(--yellow);" onclick="app.selectAgeBand('3-4')">
-                <div class="cat-icon">🌟</div>
-                <div class="cat-title">3–4 Years</div>
-                <div class="agepick-caption">Growing Fast? 🌟</div>
-            </div>
-            <div class="cat-card" style="background: var(--purple);" onclick="app.selectAgeBand('4-6')">
-                <div class="cat-icon">👑</div>
-                <div class="cat-title">4–6 Years</div>
-                <div class="agepick-caption">Almost a Pro? 👑</div>
-            </div>
+        <div class="list-menu">
+            <button class="list-btn" onclick="app.selectAgeBand('2-3')">
+                <div class="list-btn-icon" style="background: var(--green);">👶</div>
+                <div class="list-btn-text">
+                    <div class="list-btn-title">2–3 Years</div>
+                    <div class="list-btn-caption">Just Getting Started? 🌱</div>
+                </div>
+                <div class="list-btn-arrow">➜</div>
+            </button>
+            <button class="list-btn" onclick="app.selectAgeBand('3-4')">
+                <div class="list-btn-icon" style="background: var(--yellow);">🧒</div>
+                <div class="list-btn-text">
+                    <div class="list-btn-title">3–4 Years</div>
+                    <div class="list-btn-caption">Growing Fast? 🌟</div>
+                </div>
+                <div class="list-btn-arrow">➜</div>
+            </button>
+            <button class="list-btn" onclick="app.selectAgeBand('4-6')">
+                <div class="list-btn-icon" style="background: var(--purple);">🎓</div>
+                <div class="list-btn-text">
+                    <div class="list-btn-title">4–6 Years</div>
+                    <div class="list-btn-caption">Almost a Pro? 👑</div>
+                </div>
+                <div class="list-btn-arrow">➜</div>
+            </button>
         </div>
     </div>
 
@@ -850,11 +929,7 @@
             </div>
         </div>
 
-        <button class="btn-pill" style="margin-bottom: 20px; align-self: center;" onclick="app.navigateTo('agepick')">
-            🔄 <span class="ui-change-age">Change Age Group</span>
-        </button>
-
-        <div class="category-grid" id="category-grid">
+        <div class="list-menu" id="category-grid">
             </div>
     </div>
 
@@ -866,7 +941,7 @@
                 <p>Pick a topic to explore!</p>
             </div>
         </div>
-        <div class="category-grid" id="topic-grid">
+        <div class="list-menu" id="topic-grid">
             </div>
     </div>
 
@@ -1653,29 +1728,41 @@
                 grid.innerHTML = '';
                 const lang = this.state.language;
 
-                // Add the 3 tier level cards
+                const levelCaptions = {
+                    sprout: { en: 'Basics & vocabulary', my: 'Asas & perbendaharaan kata' },
+                    star: { en: 'Building up skills', my: 'Membina kemahiran' },
+                    champion: { en: 'Ready for a challenge', my: 'Sedia untuk cabaran' }
+                };
+
+                // Add the 3 tier level buttons
                 Object.entries(LEVEL_META).forEach(([key, meta]) => {
-                    const card = document.createElement('div');
-                    card.className = 'cat-card';
-                    card.style.backgroundColor = meta.color;
-                    card.innerHTML = `
-                        <div class="cat-icon">${meta.icon}</div>
-                        <div class="cat-title">${meta.name}</div>
+                    const btn = document.createElement('button');
+                    btn.className = 'list-btn';
+                    btn.innerHTML = `
+                        <div class="list-btn-icon" style="background: ${meta.color};">${meta.icon}</div>
+                        <div class="list-btn-text">
+                            <div class="list-btn-title">${meta.name}</div>
+                            <div class="list-btn-caption">${levelCaptions[key][lang]}</div>
+                        </div>
+                        <div class="list-btn-arrow">➜</div>
                     `;
-                    card.onclick = () => this.openLevel(key);
-                    grid.appendChild(card);
+                    btn.onclick = () => this.openLevel(key);
+                    grid.appendChild(btn);
                 });
 
-                // Add Mini Games Card (always accessible)
-                const gameCard = document.createElement('div');
-                gameCard.className = 'cat-card';
-                gameCard.style.backgroundColor = '#FFD1E8';
-                gameCard.innerHTML = `
-                    <div class="cat-icon">🎮</div>
-                    <div class="cat-title">${lang === 'en' ? 'Mini Games' : 'Permainan Kecil'}</div>
+                // Add Mini Games button (always accessible)
+                const gameBtn = document.createElement('button');
+                gameBtn.className = 'list-btn';
+                gameBtn.innerHTML = `
+                    <div class="list-btn-icon" style="background: #FFD1E8;">🎮</div>
+                    <div class="list-btn-text">
+                        <div class="list-btn-title">${lang === 'en' ? 'Mini Games' : 'Permainan Kecil'}</div>
+                        <div class="list-btn-caption">${lang === 'en' ? 'Fun learning games' : 'Permainan belajar seronok'}</div>
+                    </div>
+                    <div class="list-btn-arrow">➜</div>
                 `;
-                gameCard.onclick = () => this.navigateTo('games');
-                grid.appendChild(gameCard);
+                gameBtn.onclick = () => this.navigateTo('games');
+                grid.appendChild(gameBtn);
             }
 
             /**
@@ -1708,15 +1795,20 @@
                 topicIds.forEach(id => {
                     const cat = CONTENT_DB[id];
                     if (!cat) return;
-                    const card = document.createElement('div');
-                    card.className = 'cat-card';
-                    card.style.backgroundColor = cat.color;
-                    card.innerHTML = `
-                        <div class="cat-icon">${cat.icon}</div>
-                        <div class="cat-title">${cat.title[lang]}</div>
+                    const btn = document.createElement('button');
+                    btn.className = 'list-btn';
+                    const count = cat.items.length;
+                    const countLabel = lang === 'en' ? `${count} cards` : `${count} kad`;
+                    btn.innerHTML = `
+                        <div class="list-btn-icon" style="background: ${cat.color};">${cat.icon}</div>
+                        <div class="list-btn-text">
+                            <div class="list-btn-title">${cat.title[lang]}</div>
+                            <div class="list-btn-caption">${countLabel}</div>
+                        </div>
+                        <div class="list-btn-arrow">➜</div>
                     `;
-                    card.onclick = () => this.openCategory(id);
-                    grid.appendChild(card);
+                    btn.onclick = () => this.openCategory(id);
+                    grid.appendChild(btn);
                 });
             }
 
