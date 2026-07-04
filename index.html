@@ -423,6 +423,13 @@
             border-color: #CCCCCC !important;
         }
 
+        .memory-card.matched {
+            background: var(--green) !important;
+            border-color: #8FD89E !important;
+            opacity: 0.7;
+            cursor: default;
+        }
+
         /* Parent Mode Dashboard */
         .parent-header {
             display: flex;
@@ -1106,45 +1113,51 @@
                 ]
             },
             numbers: {
-                id: 'numbers', icon: '🔢', color: '#BAFFC9', minAge: 4,
+                id: 'numbers', icon: '🔢', color: '#BAFFC9', minAge: 2,
                 title: { en: 'Numbers (1-20)', my: 'Nombor (1-20)' },
-                items: Array.from({length: 20}, (_, i) => ({
-                    emoji: `${i + 1}️⃣`,
-                    en: `${i + 1}`,
-                    my: `${i + 1}`,
-                    sub: '🍎'.repeat(Math.min(i + 1, 10))
-                }))
+                items: Array.from({length: 20}, (_, i) => {
+                    const wordsEn = ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
+                                      'Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty'];
+                    const wordsMy = ['Satu','Dua','Tiga','Empat','Lima','Enam','Tujuh','Lapan','Sembilan','Sepuluh',
+                                      'Sebelas','Dua Belas','Tiga Belas','Empat Belas','Lima Belas','Enam Belas','Tujuh Belas','Lapan Belas','Sembilan Belas','Dua Puluh'];
+                    return {
+                        digit: `${i + 1}`,
+                        en: wordsEn[i],
+                        my: wordsMy[i],
+                        sub: '🍎'.repeat(Math.min(i + 1, 10))
+                    };
+                })
             },
             alphabet: {
-                id: 'alphabet', icon: '🔤', color: '#BAE1FF', minAge: 4,
+                id: 'alphabet', icon: '🔤', color: '#BAE1FF', minAge: 2,
                 title: { en: 'Alphabet (A-Z)', my: 'Abjad (A-Z)' },
                 items: [
-                    { emoji: '🍎', en: 'A - Apple', my: 'A - Apple' },
-                    { emoji: '🐻', en: 'B - Bear', my: 'B - Beruang' },
-                    { emoji: '🐱', en: 'C - Cat', my: 'C - Kucing' },
-                    { emoji: '🐶', en: 'D - Dog', my: 'D - Anjing' },
-                    { emoji: '🐘', en: 'E - Elephant', my: 'E - Gajah' },
-                    { emoji: '🐠', en: 'F - Fish', my: 'F - Ikan' },
-                    { emoji: '🦒', en: 'G - Giraffe', my: 'G - Zirafah' },
-                    { emoji: '🐴', en: 'H - Horse', my: 'H - Kuda' },
-                    { emoji: '🍦', en: 'I - Ice Cream', my: 'I - Ais Krim' },
-                    { emoji: '🧃', en: 'J - Juice', my: 'J - Jus' },
-                    { emoji: '🦘', en: 'K - Kangaroo', my: 'K - Kangarru' },
-                    { emoji: '🦁', en: 'L - Lion', my: 'L - Singa' },
-                    { emoji: '🐒', en: 'M - Monkey', my: 'M - Monyet' },
-                    { emoji: '🥜', en: 'N - Nut', my: 'N - Kacang' },
-                    { emoji: '🍊', en: 'O - Orange', my: 'O - Oren' },
-                    { emoji: '🐼', en: 'P - Panda', my: 'P - Panda' },
-                    { emoji: '👑', en: 'Q - Queen', my: 'Q - Permaisuri' },
-                    { emoji: '🌈', en: 'R - Rainbow', my: 'R - Pelangi' },
-                    { emoji: '☀️', en: 'S - Sun', my: 'S - Matahari' },
-                    { emoji: '🌳', en: 'T - Tree', my: 'T - Pokok' },
-                    { emoji: '☂️', en: 'U - Umbrella', my: 'U - Payung' },
-                    { emoji: '🎻', en: 'V - Violin', my: 'V - Biola' },
-                    { emoji: '🍉', en: 'W - Watermelon', my: 'W - Tembikai' },
-                    { emoji: 'xylophone', en: 'X - Xylophone', my: 'X - Xilofon', emoji: '🎹' },
-                    { emoji: '⛵', en: 'Y - Yacht', my: 'Y - Kapal Layar' },
-                    { emoji: '🦓', en: 'Z - Zebra', my: 'Z - Zirafah' }
+                    { letter: 'A', emoji: '🍎', en: 'Apple', my: 'Epal' },
+                    { letter: 'B', emoji: '🐻', en: 'Bear', my: 'Beruang' },
+                    { letter: 'C', emoji: '🐱', en: 'Cat', my: 'Kucing' },
+                    { letter: 'D', emoji: '🐶', en: 'Dog', my: 'Anjing' },
+                    { letter: 'E', emoji: '🐘', en: 'Elephant', my: 'Gajah' },
+                    { letter: 'F', emoji: '🐠', en: 'Fish', my: 'Ikan' },
+                    { letter: 'G', emoji: '🦒', en: 'Giraffe', my: 'Zirafah' },
+                    { letter: 'H', emoji: '🐴', en: 'Horse', my: 'Kuda' },
+                    { letter: 'I', emoji: '🍦', en: 'Ice Cream', my: 'Aiskrim' },
+                    { letter: 'J', emoji: '🧃', en: 'Juice', my: 'Jus' },
+                    { letter: 'K', emoji: '🦘', en: 'Kangaroo', my: 'Kanggaru' },
+                    { letter: 'L', emoji: '🦁', en: 'Lion', my: 'Singa' },
+                    { letter: 'M', emoji: '🐒', en: 'Monkey', my: 'Monyet' },
+                    { letter: 'N', emoji: '🥜', en: 'Nut', my: 'Kacang' },
+                    { letter: 'O', emoji: '🍊', en: 'Orange', my: 'Oren' },
+                    { letter: 'P', emoji: '🐼', en: 'Panda', my: 'Panda' },
+                    { letter: 'Q', emoji: '👑', en: 'Queen', my: 'Permaisuri' },
+                    { letter: 'R', emoji: '🌈', en: 'Rainbow', my: 'Pelangi' },
+                    { letter: 'S', emoji: '☀️', en: 'Sun', my: 'Matahari' },
+                    { letter: 'T', emoji: '🌳', en: 'Tree', my: 'Pokok' },
+                    { letter: 'U', emoji: '☂️', en: 'Umbrella', my: 'Payung' },
+                    { letter: 'V', emoji: '🎻', en: 'Violin', my: 'Biola' },
+                    { letter: 'W', emoji: '🍉', en: 'Watermelon', my: 'Tembikai' },
+                    { letter: 'X', emoji: '🎹', en: 'Xylophone', my: 'Silofon' },
+                    { letter: 'Y', emoji: '⛵', en: 'Yacht', my: 'Kapal Layar' },
+                    { letter: 'Z', emoji: '🦓', en: 'Zebra', my: 'Zebra' }
                 ]
             },
             family: {
@@ -1498,10 +1511,26 @@
             renderFlashcard() {
                 const item = this.currentCategory.items[this.currentCardIndex];
                 const lang = this.state.language;
-                
-                document.getElementById('fc-emoji').innerText = item.emoji;
-                document.getElementById('fc-word').innerText = item[lang];
-                document.getElementById('fc-subword').innerText = item[lang === 'en' ? 'my' : 'en']; // Show secondary language below
+                const catId = this.currentCategory.id;
+                const emojiEl = document.getElementById('fc-emoji');
+                const wordEl = document.getElementById('fc-word');
+                const subEl = document.getElementById('fc-subword');
+
+                if (catId === 'numbers') {
+                    // Real typed digit as the hero, spelled word + counting objects below
+                    emojiEl.innerText = item.digit;
+                    wordEl.innerText = item[lang];
+                    subEl.innerText = item.sub;
+                } else if (catId === 'alphabet') {
+                    // Real typed letter as the hero, picture + word below
+                    emojiEl.innerText = item.letter;
+                    wordEl.innerText = item[lang];
+                    subEl.innerText = `${item.emoji} ${item[lang === 'en' ? 'my' : 'en']}`;
+                } else {
+                    emojiEl.innerText = item.emoji;
+                    wordEl.innerText = item[lang];
+                    subEl.innerText = item[lang === 'en' ? 'my' : 'en']; // Show secondary language below
+                }
 
                 if (this.state.settings.autoplay) {
                     this.speakCurrentCard();
@@ -1526,9 +1555,13 @@
             speakCurrentCard() {
                 const item = this.currentCategory.items[this.currentCardIndex];
                 const lang = this.state.language;
-                const textToSpeak = item[lang];
-                
-                // If it has a specific sound (like "Woof!"), speak text then play sound
+                const catId = this.currentCategory.id;
+
+                let textToSpeak = item[lang];
+                if (catId === 'alphabet') {
+                    textToSpeak = `${item.letter}. ${item[lang]}`;
+                }
+
                 this.audio.speak(textToSpeak, lang);
             }
 
@@ -1561,7 +1594,12 @@
                 document.getElementById('game-menu').style.display = 'none';
                 const playArea = document.getElementById('game-play-area');
                 playArea.style.display = 'flex';
-                
+
+                // Reset any custom grid sizing left over from the Memory Game
+                const optsContainerReset = document.getElementById('game-options');
+                optsContainerReset.style.gridTemplateColumns = '';
+                optsContainerReset.style.maxWidth = '';
+
                 const allItems = [...CONTENT_DB.animals.items, ...CONTENT_DB.fruits.items, ...CONTENT_DB.vehicles.items];
                 const lang = this.state.language;
 
@@ -1661,9 +1699,80 @@
                         };
                         optsContainer.appendChild(btn);
                     });
+                } else if (type === 'memory') {
+                    document.getElementById('game-question').innerText = lang === 'en' ?
+                        'Find the Matching Pairs!' : 'Cari Pasangan yang Sama!';
+
+                    const optsContainer = document.getElementById('game-options');
+                    optsContainer.innerHTML = '';
+                    optsContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    optsContainer.style.maxWidth = '600px';
+
+                    // Pick 4 unique items -> 4 pairs -> 8 cards (toddler-friendly size)
+                    const pool = [...allItems].sort(() => Math.random() - 0.5);
+                    const pairItems = pool.slice(0, 4);
+                    let cards = [];
+                    pairItems.forEach((it, idx) => {
+                        cards.push({ pairId: idx, emoji: it.emoji });
+                        cards.push({ pairId: idx, emoji: it.emoji });
+                    });
+                    cards.sort(() => Math.random() - 0.5);
+
+                    this.memoryState = { flipped: [], matchedCount: 0, totalPairs: pairItems.length, lock: false };
+
+                    cards.forEach(cardData => {
+                        const btn = document.createElement('div');
+                        btn.className = 'game-opt-card memory-card';
+                        btn.innerText = '❓';
+                        btn.onclick = () => this.flipMemoryCard(btn, cardData);
+                        optsContainer.appendChild(btn);
+                    });
                 } else {
                     alert("More exciting games unlocking soon as Alyssa grows!");
                     this.navigateTo('games');
+                }
+            }
+
+            flipMemoryCard(btn, cardData) {
+                if (this.memoryState.lock) return;
+                if (btn.classList.contains('matched') || btn.classList.contains('flipped-card')) return;
+
+                this.audio.playSFX('pop');
+                btn.innerText = cardData.emoji;
+                btn.classList.add('flipped-card');
+                this.memoryState.flipped.push({ btn, cardData });
+
+                if (this.memoryState.flipped.length === 2) {
+                    this.memoryState.lock = true;
+                    const [first, second] = this.memoryState.flipped;
+
+                    if (first.cardData.pairId === second.cardData.pairId) {
+                        // Matched pair!
+                        first.btn.classList.add('matched');
+                        second.btn.classList.add('matched');
+                        this.audio.playSFX('success');
+                        this.triggerReward();
+                        this.memoryState.matchedCount++;
+                        this.memoryState.flipped = [];
+                        this.memoryState.lock = false;
+
+                        if (this.memoryState.matchedCount === this.memoryState.totalPairs) {
+                            setTimeout(() => {
+                                this.audio.playSFX('cheer');
+                                setTimeout(() => this.startMiniGame('memory'), 1200);
+                            }, 400);
+                        }
+                    } else {
+                        this.audio.playSFX('error');
+                        setTimeout(() => {
+                            first.btn.innerText = '❓';
+                            second.btn.innerText = '❓';
+                            first.btn.classList.remove('flipped-card');
+                            second.btn.classList.remove('flipped-card');
+                            this.memoryState.flipped = [];
+                            this.memoryState.lock = false;
+                        }, 800);
+                    }
                 }
             }
 
