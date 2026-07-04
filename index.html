@@ -873,9 +873,6 @@
             <button class="btn-pill" onclick="app.toggleLanguage()">
                 <span id="lang-flag">🇬🇧</span> <span id="lang-text">EN</span>
             </button>
-            <button class="btn-icon" onclick="app.navigateTo('agepick')" title="Change Age Group" style="background: var(--blue);">
-                🎂
-            </button>
             <button class="btn-icon" id="settings-btn" title="Parent Settings" style="background: var(--pink);">
                 ⚙️
             </button>
@@ -928,6 +925,10 @@
                 🔥 <span id="streak-count">1</span> <span id="streak-label">Day Streak!</span>
             </div>
         </div>
+
+        <button class="btn-pill" style="align-self: center; margin-bottom: 15px; background: var(--blue);" onclick="app.navigateTo('agepick')">
+            🔄 <span class="ui-change-age">Change Age Group</span>
+        </button>
 
         <div class="list-menu" id="category-grid">
             </div>
