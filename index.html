@@ -613,9 +613,154 @@
             .flashcard-word { font-size: 2.2rem; }
             .game-opt-card { padding: 15px; font-size: 3rem; }
         }
+        /* ===================== */
+        /* Cover / Splash Screen */
+        /* ===================== */
+        #cover-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 3000;
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #cover-screen.cover-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .cover-blob {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(2px);
+            animation: cover-float 6s ease-in-out infinite;
+        }
+        .cover-blob1 { width: 140px; height: 140px; background: var(--pink); top: 8%; left: 8%; animation-delay: 0s; }
+        .cover-blob2 { width: 100px; height: 100px; background: var(--blue); top: 15%; right: 10%; animation-delay: 1.2s; }
+        .cover-blob3 { width: 90px; height: 90px; background: var(--yellow); bottom: 12%; left: 12%; animation-delay: 0.6s; }
+        .cover-blob4 { width: 120px; height: 120px; background: var(--green); bottom: 8%; right: 8%; animation-delay: 1.8s; }
+        .cover-blob5 { width: 60px; height: 60px; background: var(--purple); top: 50%; left: 4%; animation-delay: 2.4s; }
+
+        @keyframes cover-float {
+            0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+            50% { transform: translateY(-20px) translateX(10px) scale(1.08); }
+        }
+
+        .cover-card {
+            position: relative;
+            z-index: 10;
+            background: var(--white);
+            border-radius: 40px;
+            padding: 55px 45px 45px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            animation: cover-popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cover-popIn {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .cover-mascot {
+            font-size: 5.5rem;
+            display: inline-block;
+            animation: cover-bounce 2.4s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes cover-bounce {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-14px) rotate(4deg); }
+        }
+
+        .cover-brand-title {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-tagline {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .cover-start-btn {
+            font-family: var(--font-main);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            background: var(--yellow);
+            border: none;
+            padding: 18px 45px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #E0D66B;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.15s;
+        }
+
+        .cover-start-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .cover-stars-row {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.4rem;
+        }
+
+        .cover-stars-row span {
+            animation: cover-twinkle 1.6s ease-in-out infinite;
+        }
+        .cover-stars-row span:nth-child(2) { animation-delay: 0.3s; }
+        .cover-stars-row span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes cover-twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
     </style>
 </head>
 <body>
+
+    <div id="cover-screen">
+        <div class="cover-blob cover-blob1"></div>
+        <div class="cover-blob cover-blob2"></div>
+        <div class="cover-blob cover-blob3"></div>
+        <div class="cover-blob cover-blob4"></div>
+        <div class="cover-blob cover-blob5"></div>
+
+        <div class="cover-card">
+            <div class="cover-mascot">🐣</div>
+            <div class="cover-brand-title">NiaLearn</div>
+            <div class="cover-tagline">Little Hands, Big Discoveries!</div>
+            <button class="cover-start-btn" id="cover-start-btn">
+                <span>▶</span> Let's Play!
+            </button>
+            <div class="cover-stars-row">
+                <span>⭐</span><span>🌟</span><span>⭐</span>
+            </div>
+        </div>
+    </div>
 
     <canvas id="confetti-canvas"></canvas>
 
@@ -1707,6 +1852,13 @@
                 }
             }
         }
+
+        // Cover / Splash Screen Dismissal
+        document.getElementById('cover-start-btn').addEventListener('click', () => {
+            const cover = document.getElementById('cover-screen');
+            cover.classList.add('cover-hidden');
+            setTimeout(() => cover.remove(), 500);
+        });
 
         // Initialize App on Window Load
         let app;
