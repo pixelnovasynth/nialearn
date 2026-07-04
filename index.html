@@ -1342,22 +1342,29 @@
             }
 
             setupEvents() {
-                // Long press on settings icon (3 seconds) to trigger Parent Mode
+                // Tap or click on settings icon opens Parent Mode gate.
+                // (Long-press timer kept for desktop mouse; touch is handled
+                // directly on touchend so it works reliably on mobile.)
                 let pressTimer;
                 const setBtn = document.getElementById('settings-btn');
-                
-                const startPress = (e) => {
-                    e.preventDefault();
+
+                const startPress = () => {
                     pressTimer = setTimeout(() => this.openParentGate(), 2000);
                 };
                 const cancelPress = () => clearTimeout(pressTimer);
 
                 setBtn.addEventListener('mousedown', startPress);
                 setBtn.addEventListener('mouseup', cancelPress);
-                setBtn.addEventListener('touchstart', startPress);
-                setBtn.addEventListener('touchend', cancelPress);
+
+                setBtn.addEventListener('touchstart', startPress, { passive: true });
+                setBtn.addEventListener('touchend', (e) => {
+                    cancelPress();
+                    e.preventDefault(); // stop the ghost click that would fire after this
+                    this.openParentGate();
+                });
+
                 setBtn.addEventListener('click', () => {
-                    // Fallback quick click opens gate too
+                    // Fallback for mouse clicks (desktop)
                     this.openParentGate();
                 });
 
@@ -1855,6 +1862,9 @@
 
         // Cover / Splash Screen Dismissal
         document.getElementById('cover-start-btn').addEventListener('click', () => {
+            if (typeof app !== 'undefined' && app && app.audio) {
+                app.audio.playSFX('cheer');
+            }
             const cover = document.getElementById('cover-screen');
             cover.classList.add('cover-hidden');
             setTimeout(() => cover.remove(), 500);
