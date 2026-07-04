@@ -850,6 +850,10 @@
             </div>
         </div>
 
+        <button class="btn-pill" style="margin-bottom: 20px; align-self: center;" onclick="app.navigateTo('agepick')">
+            🔄 <span class="ui-change-age">Change Age Group</span>
+        </button>
+
         <div class="category-grid" id="category-grid">
             </div>
     </div>
@@ -867,7 +871,7 @@
     </div>
 
     <div id="screen-flashcard" class="screen">
-        <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
+        <button class="back-btn" onclick="app.navigateTo('leveltopics')">⬅ <span class="ui-back">Back</span></button>
         <div class="flashcard-container">
             <div class="flashcard" id="active-flashcard" onclick="app.interactFlashcard()">
                 <div class="flashcard-emoji" id="fc-emoji">🐶</div>
@@ -1039,7 +1043,8 @@
                 badges: "Achievement Badges",
                 tryAgain: "Try Again!",
                 greatJob: "Great Job! ⭐",
-                unlockMsg: "Unlocked at Age {age}!"
+                unlockMsg: "Unlocked at Age {age}!",
+                changeAge: "Change Age Group"
             },
             my: {
                 welcome: "👋 Helo, {name}!",
@@ -1057,7 +1062,8 @@
                 badges: "Lencana Pencapaian",
                 tryAgain: "Cuba Lagi!",
                 greatJob: "Syabas! ⭐",
-                unlockMsg: "Diberhentikan hingga Umur {age}!"
+                unlockMsg: "Diberhentikan hingga Umur {age}!",
+                changeAge: "Tukar Kumpulan Umur"
             }
         };
 
@@ -1590,6 +1596,7 @@
                 document.getElementById(`screen-${screenId}`).classList.add('active');
 
                 if (screenId === 'home') this.renderHomeGrid();
+                if (screenId === 'leveltopics' && this.currentLevel) this.renderLevelTopics();
                 if (screenId === 'rewards') this.renderRewards();
                 if (screenId === 'parent') this.renderParentDashboard();
                 if (screenId === 'games') {
@@ -1619,6 +1626,7 @@
                 document.getElementById('streak-label').innerText = t.streak;
 
                 document.querySelectorAll('.ui-back').forEach(el => el.innerText = t.back);
+                document.querySelectorAll('.ui-change-age').forEach(el => el.innerText = t.changeAge);
                 document.querySelectorAll('.ui-prev').forEach(el => el.innerText = t.prev);
                 document.querySelectorAll('.ui-next').forEach(el => el.innerText = t.next);
                 
@@ -1683,7 +1691,6 @@
             openLevel(levelKey) {
                 this.currentLevel = levelKey;
                 this.navigateTo('leveltopics');
-                this.renderLevelTopics();
             }
 
             renderLevelTopics() {
