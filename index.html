@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NiaLearn - Little Hands, Big Discoveries!</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #FFF9E6;
+            --text-main: #4A3E3D;
+            --text-light: #7A6E6D;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            --pink: #FFB3BA;
+            --peach: #FFDFBA;
+            --yellow: #FFFFBA;
+            --green: #BAFFC9;
+            --blue: #BAE1FF;
+            --purple: #E8C5FF;
+            --white: #FFFFFF;
+            --font-main: 'Fredoka', 'Nunito', sans-serif;
+        }
+
+        body.dark-mode {
+            --bg-color: #1E1A24;
+            --text-main: #F0E6FF;
+            --text-light: #B8AAFF;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            --white: #2C2636;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--white);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tagline {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-pill {
+            background: var(--bg-color);
+            border: 2px solid #E0D6CC;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #E0D6CC;
+        }
+
+        .btn-pill:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: var(--purple);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #C393E8;
+            transition: transform 0.2s;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9) translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            flex: 1;
+            padding: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Banner / Welcome */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--pink), var(--peach));
+            padding: 20px 30px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            color: #4A3E3D;
+        }
+
+        .welcome-text h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .streak-badge {
+            background: rgba(255,255,255,0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grid Layout for Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding-bottom: 40px;
+        }
+
+        .cat-card {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+
+        .cat-card:active {
+            transform: scale(0.95);
+        }
+
+        .cat-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            transition: transform 0.3s;
+        }
+
+        .cat-card:hover .cat-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .cat-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .age-lock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FF6B6B;
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        /* Flashcard View */
+        .flashcard-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .flashcard {
+            background: var(--white);
+            width: 100%;
+            aspect-ratio: 4/5;
+            max-height: 60vh;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            border: 8px solid var(--blue);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flashcard:active {
+            transform: scale(0.96);
+        }
+
+        .flashcard-emoji {
+            font-size: 8rem;
+            animation: float 3s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .flashcard-word {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .flashcard-subword {
+            font-size: 1.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .speaker-btn {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            background: var(--yellow);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #DBD88C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speaker-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .nav-arrows {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 25px;
+            gap: 20px;
+        }
+
+        .arrow-btn {
+            flex: 1;
+            background: var(--green);
+            border: none;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #8FD89E;
+            color: #2D5A37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .arrow-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        /* Mini Games UI */
+        .game-board {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .game-question {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            background: var(--white);
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .game-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .game-opt-card {
+            background: var(--white);
+            border: 4px solid var(--peach);
+            border-radius: 25px;
+            padding: 30px;
+            font-size: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s;
+            aspect-ratio: 1;
+        }
+
+        .game-opt-card:hover {
+            transform: scale(1.05);
+        }
+
+        .game-opt-card:active {
+            transform: scale(0.95);
+        }
+
+        .shadow-object {
+            filter: brightness(0) invert(0.8);
+            background: #E0E0E0 !important;
+            border-color: #CCCCCC !important;
+        }
+
+        /* Parent Mode Dashboard */
+        .parent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--peach);
+            padding-bottom: 15px;
+        }
+
+        .parent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .panel h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #FF6B6B;
+            border-bottom: 2px dashed var(--bg-color);
+            padding-bottom: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: var(--bg-color);
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #45B7D1);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 2px solid #E0D6CC;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            accent-color: #FF6B6B;
+        }
+
+        /* Modals & Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #FF6B6B;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .modal-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .modal input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 15px;
+            border: 2px solid #E0D6CC;
+            font-family: var(--font-main);
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Back Button */
+        .back-btn {
+            align-self: flex-start;
+            margin-bottom: 20px;
+            background: var(--peach);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #5C4326;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #DDA973;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Responsive Layout Overrides */
+        @media (max-width: 600px) {
+            .brand-title { font-size: 1.4rem; }
+            .welcome-banner { flex-direction: column; text-align: center; gap: 15px; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .flashcard { aspect-ratio: 1; }
+            .flashcard-emoji { font-size: 6rem; }
+            .flashcard-word { font-size: 2.2rem; }
+            .game-opt-card { padding: 15px; font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <header>
+        <div class="brand" onclick="app.navigateTo('home')">
+            <span class="brand-title">✨ NiaLearn</span>
+            <span class="brand-tagline">Little Hands, Big Discoveries!</span>
+        </div>
+        <div class="nav-controls">
+            <button class="btn-pill" onclick="app.navigateTo('rewards')" title="Rewards">
+                ⭐ <span id="star-count">0</span>
+            </button>
+            <button class="btn-pill" onclick="app.toggleLanguage()">
+                <span id="lang-flag">🇬🇧</span> <span id="lang-text">EN</span>
+            </button>
+            <button class="btn-icon" id="settings-btn" title="Parent Settings" style="background: var(--pink);">
+                ⚙️
+            </button>
+        </div>
+    </header>
+
+    <div id="screen-home" class="screen active">
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1 id="welcome-title">👋 Hello, Alyssa!</h1>
+                <p id="welcome-sub">Let's Learn Together Today!</p>
+            </div>
+            <div class="streak-badge">
+                🔥 <span id="streak-count">1</span> <span id="streak-label">Day Streak!</span>
+            </div>
+        </div>
+
+        <div class="category-grid" id="category-grid">
+            </div>
+    </div>
+
+    <div id="screen-flashcard" class="screen">
+        <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
+        <div class="flashcard-container">
+            <div class="flashcard" id="active-flashcard" onclick="app.interactFlashcard()">
+                <div class="flashcard-emoji" id="fc-emoji">🐶</div>
+                <div class="flashcard-word" id="fc-word">DOG</div>
+                <div class="flashcard-subword" id="fc-subword">Anjing</div>
+                <button class="speaker-btn" onclick="event.stopPropagation(); app.speakCurrentCard();">🔊</button>
+            </div>
+            <div class="nav-arrows">
+                <button class="arrow-btn" onclick="app.prevCard()">⬅ <span class="ui-prev">Prev</span></button>
+                <button class="arrow-btn" onclick="app.nextCard()"><span class="ui-next">Next</span> ➡</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-games" class="screen">
+        <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
+        <div id="game-menu" class="category-grid">
+            <div class="cat-card" style="background: var(--yellow);" onclick="app.startMiniGame('find')">
+                <div class="cat-icon">🔍</div>
+                <div class="cat-title ui-game-find">Find the Picture</div>
+            </div>
+            <div class="cat-card" style="background: var(--blue);" onclick="app.startMiniGame('shadow')">
+                <div class="cat-icon">👥</div>
+                <div class="cat-title ui-game-shadow">Match Shadow</div>
+            </div>
+            <div class="cat-card" style="background: var(--pink);" onclick="app.startMiniGame('sound')">
+                <div class="cat-icon">🎵</div>
+                <div class="cat-title ui-game-sound">Animal Sounds</div>
+            </div>
+            <div class="cat-card" style="background: var(--green);" onclick="app.startMiniGame('memory')">
+                <div class="cat-icon">🧠</div>
+                <div class="cat-title ui-game-memory">Memory Game</div>
+            </div>
+        </div>
+        <div id="game-play-area" class="game-board" style="display: none;">
+            <div class="game-question" id="game-question">Where is the Elephant?</div>
+            <div class="game-options" id="game-options"></div>
+        </div>
+    </div>
+
+    <div id="screen-rewards" class="screen">
+        <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
+        <div class="welcome-banner" style="background: linear-gradient(135deg, var(--yellow), var(--purple));">
+            <div class="welcome-text">
+                <h1>🏆 <span class="ui-rewards-title">Alyssa's Trophy Room</span></h1>
+                <p><span class="ui-rewards-sub">You are doing an amazing job!</span></p>
+            </div>
+            <div class="streak-badge" style="font-size: 2rem;">
+                ⭐ <span id="reward-total-stars">0</span>
+            </div>
+        </div>
+        <h2 style="margin-bottom: 15px; color: var(--text-main);">🥇 <span class="ui-badges">Achievement Badges</span></h2>
+        <div class="category-grid" id="badge-grid">
+            </div>
+    </div>
+
+    <div id="screen-parent" class="screen">
+        <div class="parent-header">
+            <div>
+                <h1 style="color: #FF6B6B;">⚙️ Parent Dashboard</h1>
+                <p style="color: var(--text-light);">Manage learning progression and preferences</p>
+            </div>
+            <button class="btn-pill" style="background: #FF6B6B; color: white; border-color: #FF5252;" onclick="app.navigateTo('home')">Exit Parent Mode</button>
+        </div>
+
+        <div class="parent-grid">
+            <div class="panel">
+                <h3>👧 Child Profile & "Grow With Me"</h3>
+                <div class="form-group">
+                    <label>Child's Name:</label>
+                    <input type="text" id="setting-name" value="Alyssa" onchange="app.updateSettings()">
+                </div>
+                <div class="form-group">
+                    <label>Age Group (Unlocks progressive content):</label>
+                    <select id="setting-age" onchange="app.updateSettings()">
+                        <option value="2">2–3 Years (Tap & Vocab Only)</option>
+                        <option value="3">3–4 Years (+ Matching & Shapes)</option>
+                        <option value="4">4–5 Years (+ Alphabet & Numbers)</option>
+                        <option value="5">5–6 Years (+ Memory & Quizzes)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Primary Language:</label>
+                    <select id="setting-lang" onchange="app.updateSettings()">
+                        <option value="en">English 🇬🇧</option>
+                        <option value="my">Bahasa Melayu 🇲🇾</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📈 Alyssa's Learning Progress</h3>
+                <div class="stat-row"><span>Daily Streak:</span> <strong id="stat-streak">1 Day</strong></div>
+                <div class="stat-row"><span>Total Stars Earned:</span> <strong id="stat-stars">0 ⭐</strong></div>
+                <div class="stat-row"><span>Categories Explored:</span> <strong id="stat-cats">0 / 14</strong></div>
+                
+                <h4 style="margin-top: 15px; margin-bottom: 5px;">Category Mastery:</h4>
+                <div id="progress-bars-container">
+                    </div>
+            </div>
+
+            <div class="panel">
+                <h3>🛠️ App & Audio Settings</h3>
+                <label class="checkbox-group"><input type="checkbox" id="setting-tts" checked onchange="app.updateSettings()"> Enable Voice Narration (TTS)</label>
+                <label class="checkbox-group"><input type="checkbox" id="setting-sfx" checked onchange="app.updateSettings()"> Cheerful Sound Effects</label>
+                <label class="checkbox-group"><input type="checkbox" id="setting-anim" checked onchange="app.updateSettings()"> Celebration Animations</label>
+                <label class="checkbox-group"><input type="checkbox" id="setting-dark" onchange="app.updateSettings()"> Night / Dark Mode</label>
+                <label class="checkbox-group"><input type="checkbox" id="setting-autoplay" checked onchange="app.updateSettings()"> Auto-Play Narration on Tap</label>
+
+                <h3 style="margin-top: 20px;">☁️ Cloud Backup (Firebase)</h3>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">Sync progress securely using Project ID: <strong>nialearn-del</strong></p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-pill" style="flex:1; justify-content: center; background: var(--blue);" onclick="app.backupToFirebase()">⬆ Backup</button>
+                    <button class="btn-pill" style="flex:1; justify-content: center; background: var(--green);" onclick="app.restoreFromFirebase()">⬇ Restore</button>
+                </div>
+                <button class="btn-pill" style="width: 100%; justify-content: center; margin-top: 10px; background: #FFB3BA; color: #902430;" onclick="app.resetProgress()">⚠️ Reset All Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="parent-gate-modal">
+        <div class="modal">
+            <h2>🔒 Parent Access Only</h2>
+            <p>Please solve this math question to enter Parent Mode:</p>
+            <div style="font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: var(--text-main);" id="math-question">7 + 5 = ?</div>
+            <div class="modal-inputs">
+                <input type="number" id="math-answer" placeholder="?">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-pill" style="background: var(--bg-color);" onclick="app.closeParentGate()">Cancel</button>
+                <button class="btn-pill" style="background: var(--green);" onclick="app.verifyParentGate()">Enter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * FIREBASE CONFIGURATION (Provided by User)
+         */
+        const firebaseConfig = {
+            apiKey: "AIzaSyCATVIsd6UsySeH1V-LqNCADzOM5PU3NHQ",
+            authDomain: "nialearn-del.firebaseapp.com",
+            databaseURL: "https://nialearn-del-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "nialearn-del",
+            storageBucket: "nialearn-del.firebasestorage.app",
+            messagingSenderId: "1032174652420",
+            appId: "1:1032174652420:web:1a22f57139cb100c8ef951"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        /**
+         * MULTILINGUAL DICTIONARY & UI TRANSLATIONS
+         */
+        const UI_TRANSLATIONS = {
+            en: {
+                welcome: "👋 Hello, {name}!",
+                welcomeSub: "Let's Learn Together Today!",
+                streak: "Day Streak!",
+                back: "Back",
+                prev: "Prev",
+                next: "Next",
+                gameFind: "Find the Picture",
+                gameShadow: "Match Shadow",
+                gameSound: "Animal Sounds",
+                gameMemory: "Memory Game",
+                rewardsTitle: "{name}'s Trophy Room",
+                rewardsSub: "You are doing an amazing job!",
+                badges: "Achievement Badges",
+                tryAgain: "Try Again!",
+                greatJob: "Great Job! ⭐",
+                unlockMsg: "Unlocked at Age {age}!"
+            },
+            my: {
+                welcome: "👋 Helo, {name}!",
+                welcomeSub: "Jom Belajar Bersama Hari Ini!",
+                streak: "Hari Berturut!",
+                back: "Kembali",
+                prev: "Sebelum",
+                next: "Seterusnya",
+                gameFind: "Cari Gambar",
+                gameShadow: "Padankan Bayang",
+                gameSound: "Bunyi Haiwan",
+                gameMemory: "Permainan Memori",
+                rewardsTitle: "Bilik Trofi {name}",
+                rewardsSub: "Sangat hebat dan pintar!",
+                badges: "Lencana Pencapaian",
+                tryAgain: "Cuba Lagi!",
+                greatJob: "Syabas! ⭐",
+                unlockMsg: "Diberhentikan hingga Umur {age}!"
+            }
+        };
+
+        /**
+         * CURRICULUM CONTENT DATABASE (Grow With Me Tiers included)
+         */
+        const CONTENT_DB = {
+            animals: {
+                id: 'animals', icon: '🐶', color: '#FFB3BA', minAge: 2,
+                title: { en: 'Animals', my: 'Haiwan' },
+                items: [
+                    { emoji: '🐶', en: 'Dog', my: 'Anjing', sound: 'Woof Woof!' },
+                    { emoji: '🐱', en: 'Cat', my: 'Kucing', sound: 'Miaow!' },
+                    { emoji: '🐮', en: 'Cow', my: 'Lembu', sound: 'Moo!' },
+                    { emoji: '🐴', en: 'Horse', my: 'Kuda', sound: 'Neigh!' },
+                    { emoji: '🐘', en: 'Elephant', my: 'Gajah', sound: 'Pawoo!' },
+                    { emoji: '🦁', en: 'Lion', my: 'Singa', sound: 'Roar!' },
+                    { emoji: '🐒', en: 'Monkey', my: 'Monyet', sound: 'Ooh Ooh Aah!' },
+                    { emoji: '🐼', en: 'Panda', my: 'Panda', sound: 'Yum bamboo!' },
+                    { emoji: '🦒', en: 'Giraffe', my: 'Zirafah', sound: 'Munch munch!' },
+                    { emoji: '🐔', en: 'Chicken', my: 'Ayam', sound: 'Cluck cluck!' },
+                    { emoji: '🐠', en: 'Fish', my: 'Ikan', sound: 'Blub blub!' },
+                    { emoji: '🦋', en: 'Butterfly', my: 'Rama-rama', sound: 'Flutter!' }
+                ]
+            },
+            fruits: {
+                id: 'fruits', icon: '🍎', color: '#FFDFBA', minAge: 2,
+                title: { en: 'Fruits', my: 'Buah-buahan' },
+                items: [
+                    { emoji: '🍎', en: 'Apple', my: 'Epal' },
+                    { emoji: '🍌', en: 'Banana', my: 'Pisang' },
+                    { emoji: '🍊', en: 'Orange', my: 'Oren' },
+                    { emoji: '🍓', en: 'Strawberry', my: 'Strawberi' },
+                    { emoji: '🍉', en: 'Watermelon', my: 'Tembikai' },
+                    { emoji: '🥭', en: 'Mango', my: 'Mangga' },
+                    { emoji: '🍇', en: 'Grapes', my: 'Anggur' }
+                ]
+            },
+            vegetables: {
+                id: 'vegetables', icon: '🥦', color: '#BAFFC9', minAge: 2,
+                title: { en: 'Vegetables', my: 'Sayur-sayuran' },
+                items: [
+                    { emoji: '🥦', en: 'Broccoli', my: 'Brokoli' },
+                    { emoji: '🥕', en: 'Carrot', my: 'Lobak Merah' },
+                    { emoji: '🌽', en: 'Corn', my: 'Jagung' },
+                    { emoji: '🍅', en: 'Tomato', my: 'Tomato' },
+                    { emoji: '🥔', en: 'Potato', my: 'Kentang' }
+                ]
+            },
+            vehicles: {
+                id: 'vehicles', icon: '🚗', color: '#BAE1FF', minAge: 2,
+                title: { en: 'Vehicles', my: 'Kenderaan' },
+                items: [
+                    { emoji: '🚗', en: 'Car', my: 'Kereta', sound: 'Beep Beep!' },
+                    { emoji: '🚌', en: 'Bus', my: 'Bas', sound: 'Honk Honk!' },
+                    { emoji: '🚓', en: 'Police Car', my: 'Kereta Polis', sound: 'Wee-woo!' },
+                    { emoji: '🚒', en: 'Fire Truck', my: 'Kereta Bomba', sound: 'Siren!' },
+                    { emoji: '✈️', en: 'Airplane', my: 'Kapal Terbang', sound: 'Whoosh!' },
+                    { emoji: '🚂', en: 'Train', my: 'Kereta Api', sound: 'Choo Choo!' }
+                ]
+            },
+            house: {
+                id: 'house', icon: '🏠', color: '#E8C5FF', minAge: 2,
+                title: { en: 'Inside the House', my: 'Dalam Rumah' },
+                items: [
+                    { emoji: '🛏️', en: 'Bed', my: 'Katil' },
+                    { emoji: '🪑', en: 'Chair', my: 'Kerusi' },
+                    { emoji: '🚪', en: 'Door', my: 'Pintu' },
+                    { emoji: '🛋️', en: 'Sofa', my: 'Sofa' },
+                    { emoji: '📺', en: 'Television', my: 'Televisyen' },
+                    { emoji: '🪥', en: 'Toothbrush', my: 'Berus Gigi' },
+                    { emoji: '🚿', en: 'Shower', my: 'Pancuran Mandi' },
+                    { emoji: '🧴', en: 'Soap', my: 'Sabun' }
+                ]
+            },
+            outdoor: {
+                id: 'outdoor', icon: '🌳', color: '#FFFFBA', minAge: 3,
+                title: { en: 'Outdoor Objects', my: 'Objek Luar' },
+                items: [
+                    { emoji: '🌳', en: 'Tree', my: 'Pokok' },
+                    { emoji: '☀️', en: 'Sun', my: 'Matahari' },
+                    { emoji: '🌙', en: 'Moon', my: 'Bulan' },
+                    { emoji: '⭐', en: 'Star', my: 'Bintang' },
+                    { emoji: '🌈', en: 'Rainbow', my: 'Pelangi' },
+                    { emoji: '🏖️', en: 'Beach', my: 'Pantai' },
+                    { emoji: '🏞️', en: 'Mountain', my: 'Gunung' }
+                ]
+            },
+            colors: {
+                id: 'colors', icon: '🎨', color: '#FFB3BA', minAge: 3,
+                title: { en: 'Colors', my: 'Warna' },
+                items: [
+                    { emoji: '🔴', en: 'Red', my: 'Merah' },
+                    { emoji: '🟡', en: 'Yellow', my: 'Kuning' },
+                    { emoji: '🔵', en: 'Blue', my: 'Biru' },
+                    { emoji: '🟢', en: 'Green', my: 'Hijau' },
+                    { emoji: '🟣', en: 'Purple', my: 'Ungu' },
+                    { emoji: '⚫', en: 'Black', my: 'Hitam' },
+                    { emoji: '⚪', en: 'White', my: 'Putih' },
+                    { emoji: '🟠', en: 'Orange', my: 'Oren' }
+                ]
+            },
+            shapes: {
+                id: 'shapes', icon: '⭐', color: '#FFDFBA', minAge: 3,
+                title: { en: 'Shapes', my: 'Bentuk' },
+                items: [
+                    { emoji: '⭕', en: 'Circle', my: 'Bulatan' },
+                    { emoji: '⬜', en: 'Square', my: 'Segi Empat' },
+                    { emoji: '🔺', en: 'Triangle', my: 'Segi Tiga' },
+                    { emoji: '⭐', en: 'Star', my: 'Bintang' },
+                    { emoji: '❤️', en: 'Heart', my: 'Hati' },
+                    { emoji: '⬟', en: 'Pentagon', my: 'Pentagon' },
+                    { emoji: '⬢', en: 'Hexagon', my: 'Heksagon' }
+                ]
+            },
+            numbers: {
+                id: 'numbers', icon: '🔢', color: '#BAFFC9', minAge: 4,
+                title: { en: 'Numbers (1-20)', my: 'Nombor (1-20)' },
+                items: Array.from({length: 20}, (_, i) => ({
+                    emoji: `${i + 1}️⃣`,
+                    en: `${i + 1}`,
+                    my: `${i + 1}`,
+                    sub: '🍎'.repeat(Math.min(i + 1, 10))
+                }))
+            },
+            alphabet: {
+                id: 'alphabet', icon: '🔤', color: '#BAE1FF', minAge: 4,
+                title: { en: 'Alphabet (A-Z)', my: 'Abjad (A-Z)' },
+                items: [
+                    { emoji: '🍎', en: 'A - Apple', my: 'A - Apple' },
+                    { emoji: '🐻', en: 'B - Bear', my: 'B - Beruang' },
+                    { emoji: '🐱', en: 'C - Cat', my: 'C - Kucing' },
+                    { emoji: '🐶', en: 'D - Dog', my: 'D - Anjing' },
+                    { emoji: '🐘', en: 'E - Elephant', my: 'E - Gajah' },
+                    { emoji: '🐠', en: 'F - Fish', my: 'F - Ikan' },
+                    { emoji: '🦒', en: 'G - Giraffe', my: 'G - Zirafah' },
+                    { emoji: '🐴', en: 'H - Horse', my: 'H - Kuda' },
+                    { emoji: '🍦', en: 'I - Ice Cream', my: 'I - Ais Krim' },
+                    { emoji: '🧃', en: 'J - Juice', my: 'J - Jus' },
+                    { emoji: '🦘', en: 'K - Kangaroo', my: 'K - Kangarru' },
+                    { emoji: '🦁', en: 'L - Lion', my: 'L - Singa' },
+                    { emoji: '🐒', en: 'M - Monkey', my: 'M - Monyet' },
+                    { emoji: '🥜', en: 'N - Nut', my: 'N - Kacang' },
+                    { emoji: '🍊', en: 'O - Orange', my: 'O - Oren' },
+                    { emoji: '🐼', en: 'P - Panda', my: 'P - Panda' },
+                    { emoji: '👑', en: 'Q - Queen', my: 'Q - Permaisuri' },
+                    { emoji: '🌈', en: 'R - Rainbow', my: 'R - Pelangi' },
+                    { emoji: '☀️', en: 'S - Sun', my: 'S - Matahari' },
+                    { emoji: '🌳', en: 'T - Tree', my: 'T - Pokok' },
+                    { emoji: '☂️', en: 'U - Umbrella', my: 'U - Payung' },
+                    { emoji: '🎻', en: 'V - Violin', my: 'V - Biola' },
+                    { emoji: '🍉', en: 'W - Watermelon', my: 'W - Tembikai' },
+                    { emoji: 'xylophone', en: 'X - Xylophone', my: 'X - Xilofon', emoji: '🎹' },
+                    { emoji: '⛵', en: 'Y - Yacht', my: 'Y - Kapal Layar' },
+                    { emoji: '🦓', en: 'Z - Zebra', my: 'Z - Zirafah' }
+                ]
+            },
+            family: {
+                id: 'family', icon: '👨‍👩‍👧', color: '#E8C5FF', minAge: 2,
+                title: { en: 'Family Members', my: 'Ahli Keluarga' },
+                items: [
+                    { emoji: '👨', en: 'Father', my: 'Ayah' },
+                    { emoji: '👩', en: 'Mother', my: 'Ibu' },
+                    { emoji: '👦', en: 'Brother', my: 'Abang / Adik Lelaki' },
+                    { emoji: '👧', en: 'Sister', my: 'Kakak / Adik Perempuan' },
+                    { emoji: '👶', en: 'Baby', my: 'Bayi' },
+                    { emoji: '👴', en: 'Grandfather', my: 'Datuk' },
+                    { emoji: '👵', en: 'Grandmother', my: 'Nenek' }
+                ]
+            },
+            clothes: {
+                id: 'clothes', icon: '👕', color: '#FFB3BA', minAge: 3,
+                title: { en: 'Clothes', my: 'Pakaian' },
+                items: [
+                    { emoji: '👕', en: 'Shirt', my: 'Baju' },
+                    { emoji: '👖', en: 'Pants', my: 'Seluar' },
+                    { emoji: '👗', en: 'Dress', my: 'Gaun' },
+                    { emoji: '🧦', en: 'Socks', my: 'Stoking' },
+                    { emoji: '👟', en: 'Shoes', my: 'Kasut' },
+                    { emoji: '🧢', en: 'Hat', my: 'Topi' }
+                ]
+            },
+            food: {
+                id: 'food', icon: '🍽️', color: '#FFDFBA', minAge: 2,
+                title: { en: 'Food', my: 'Makanan' },
+                items: [
+                    { emoji: '🍚', en: 'Rice', my: 'Nasi' },
+                    { emoji: '🍞', en: 'Bread', my: 'Roti' },
+                    { emoji: '🥚', en: 'Egg', my: 'Telur' },
+                    { emoji: '🧀', en: 'Cheese', my: 'Keju' },
+                    { emoji: '🥛', en: 'Milk', my: 'Susu' },
+                    { emoji: '🥞', en: 'Pancakes', my: 'Lempeng' }
+                ]
+            },
+            toys: {
+                id: 'toys', icon: '🧸', color: '#BAFFC9', minAge: 2,
+                title: { en: 'Toys', my: 'Mainan' },
+                items: [
+                    { emoji: '🧸', en: 'Teddy Bear', my: 'Patung Beruang' },
+                    { emoji: '⚽', en: 'Ball', my: 'Bola' },
+                    { emoji: '🚗', en: 'Toy Car', my: 'Kereta Mainan' },
+                    { emoji: '🪀', en: 'Yo-Yo', my: 'Yo-Yo' },
+                    { emoji: '🪁', en: 'Kite', my: 'Layang-layang' },
+                    { emoji: '🎨', en: 'Crayons', my: 'Krayon' }
+                ]
+            }
+        };
+
+        /**
+         * AUDIO & SFX ENGINE (100% Offline using Web Audio API & SpeechSynthesis)
+         */
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.synth = window.speechSynthesis;
+            }
+
+            initCtx() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            }
+
+            playSFX(type) {
+                if (!app.state.settings.sfx) return;
+                this.initCtx();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                const now = this.ctx.currentTime;
+
+                if (type === 'pop') {
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if (type === 'success' || type === 'cheer') {
+                    // Cheerful Arpeggio
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+                    notes.forEach((freq, idx) => {
+                        const subOsc = this.ctx.createOscillator();
+                        const subGain = this.ctx.createGain();
+                        subOsc.connect(subGain);
+                        subGain.connect(this.ctx.destination);
+                        subOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        subGain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                        subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+                        subOsc.start(now + idx * 0.08);
+                        subOsc.stop(now + idx * 0.08 + 0.2);
+                    });
+                } else if (type === 'error') {
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                }
+            }
+
+            speak(text, lang = 'en') {
+                if (!this.synth || !app.state.settings.tts) return;
+                this.synth.cancel(); // Stop previous utterance
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang === 'my' ? 'ms-MY' : 'en-US';
+                utterance.rate = 0.85; // slightly slower, clearer for toddlers
+                utterance.pitch = 1.1; // friendly child-like pitch
+
+                this.synth.speak(utterance);
+            }
+        }
+
+        /**
+         * AI FUTURE ARCHITECTURE HOOK
+         */
+        class NiaAI {
+            static async generateBedtimeStory(childName, theme) {
+                console.log(`[AI Architecture Ready]: Generating adaptive bedtime story for ${childName} about ${theme}...`);
+                // Future integration point for LLM API call
+                return `Once upon a time, ${childName} went on a magical journey to explore numbers and colors...`;
+            }
+
+            static analyzeWeeklyProgress(progressData) {
+                console.log(`[AI Architecture Ready]: Analyzing learning patterns for adaptive recommendations...`);
+                return { suggestedCategory: 'colors', difficultyTier: 2 };
+            }
+        }
+
+        /**
+         * MAIN APPLICATION CONTROLLER
+         */
+        class NiaLearnApp {
+            constructor() {
+                this.audio = new AudioEngine();
+                this.state = this.loadState();
+                this.currentCategory = null;
+                this.currentCardIndex = 0;
+                this.activeGame = null;
+                this.touchStartX = 0;
+                this.mathAnswer = 0;
+
+                this.initUI();
+                this.setupEvents();
+            }
+
+            loadState() {
+                const defaultState = {
+                    name: 'Alyssa',
+                    ageGroup: 3, // Default age 3 (Grow with me mode)
+                    language: 'en',
+                    stars: 0,
+                    streak: 1,
+                    lastLogin: Date.now(),
+                    progress: {},
+                    settings: {
+                        tts: true, sfx: true, anim: true, dark: false, autoplay: true
+                    }
+                };
+                const saved = localStorage.getItem('nialearn_state');
+                return saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
+            }
+
+            saveState() {
+                localStorage.setItem('nialearn_state', JSON.stringify(this.state));
+                this.updateHeaderStats();
+            }
+
+            initUI() {
+                // Apply theme & language settings
+                if (this.state.settings.dark) document.body.classList.add('dark-mode');
+                this.updateLanguageUI();
+                this.renderHomeGrid();
+                this.updateHeaderStats();
+
+                // Check daily streak
+                const oneDay = 86400000;
+                if (Date.now() - this.state.lastLogin > oneDay * 2) {
+                    this.state.streak = 1; // Reset streak if missed a day
+                } else if (Date.now() - this.state.lastLogin > oneDay) {
+                    this.state.streak += 1;
+                }
+                this.state.lastLogin = Date.now();
+                this.saveState();
+            }
+
+            setupEvents() {
+                // Long press on settings icon (3 seconds) to trigger Parent Mode
+                let pressTimer;
+                const setBtn = document.getElementById('settings-btn');
+                
+                const startPress = (e) => {
+                    e.preventDefault();
+                    pressTimer = setTimeout(() => this.openParentGate(), 2000);
+                };
+                const cancelPress = () => clearTimeout(pressTimer);
+
+                setBtn.addEventListener('mousedown', startPress);
+                setBtn.addEventListener('mouseup', cancelPress);
+                setBtn.addEventListener('touchstart', startPress);
+                setBtn.addEventListener('touchend', cancelPress);
+                setBtn.addEventListener('click', () => {
+                    // Fallback quick click opens gate too
+                    this.openParentGate();
+                });
+
+                // Swipe navigation on flashcard
+                const fc = document.getElementById('active-flashcard');
+                fc.addEventListener('touchstart', e => { this.touchStartX = e.changedTouches[0].screenX; });
+                fc.addEventListener('touchend', e => {
+                    const diff = e.changedTouches[0].screenX - this.touchStartX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) this.prevCard();
+                        else this.nextCard();
+                    }
+                });
+            }
+
+            navigateTo(screenId) {
+                this.audio.playSFX('pop');
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(`screen-${screenId}`).classList.add('active');
+
+                if (screenId === 'home') this.renderHomeGrid();
+                if (screenId === 'rewards') this.renderRewards();
+                if (screenId === 'parent') this.renderParentDashboard();
+                if (screenId === 'games') {
+                    document.getElementById('game-menu').style.display = 'grid';
+                    document.getElementById('game-play-area').style.display = 'none';
+                }
+            }
+
+            toggleLanguage() {
+                this.audio.playSFX('pop');
+                this.state.language = this.state.language === 'en' ? 'my' : 'en';
+                this.saveState();
+                this.updateLanguageUI();
+                this.renderHomeGrid();
+                if (this.currentCategory) this.renderFlashcard();
+            }
+
+            updateLanguageUI() {
+                const lang = this.state.language;
+                document.getElementById('lang-flag').innerText = lang === 'en' ? '🇬🇧' : '🇲🇾';
+                document.getElementById('lang-text').innerText = lang.toUpperCase();
+
+                // Translate static text elements
+                const t = UI_TRANSLATIONS[lang];
+                document.getElementById('welcome-title').innerText = t.welcome.replace('{name}', this.state.name);
+                document.getElementById('welcome-sub').innerText = t.welcomeSub;
+                document.getElementById('streak-label').innerText = t.streak;
+
+                document.querySelectorAll('.ui-back').forEach(el => el.innerText = t.back);
+                document.querySelectorAll('.ui-prev').forEach(el => el.innerText = t.prev);
+                document.querySelectorAll('.ui-next').forEach(el => el.innerText = t.next);
+                
+                if (document.querySelector('.ui-game-find')) document.querySelector('.ui-game-find').innerText = t.gameFind;
+                if (document.querySelector('.ui-game-shadow')) document.querySelector('.ui-game-shadow').innerText = t.gameShadow;
+                if (document.querySelector('.ui-game-sound')) document.querySelector('.ui-game-sound').innerText = t.gameSound;
+                if (document.querySelector('.ui-game-memory')) document.querySelector('.ui-game-memory').innerText = t.gameMemory;
+                
+                if (document.querySelector('.ui-rewards-title')) document.querySelector('.ui-rewards-title').innerText = t.rewardsTitle.replace('{name}', this.state.name);
+                if (document.querySelector('.ui-rewards-sub')) document.querySelector('.ui-rewards-sub').innerText = t.rewardsSub;
+                if (document.querySelector('.ui-badges')) document.querySelector('.ui-badges').innerText = t.badges;
+            }
+
+            updateHeaderStats() {
+                document.getElementById('star-count').innerText = this.state.stars;
+                document.getElementById('streak-count').innerText = this.state.streak;
+            }
+
+            /**
+             * HOME & GROW WITH ME RENDERING
+             */
+            renderHomeGrid() {
+                const grid = document.getElementById('category-grid');
+                grid.innerHTML = '';
+                const lang = this.state.language;
+                const userAge = parseInt(this.state.ageGroup);
+
+                // Add regular categories
+                Object.values(CONTENT_DB).forEach(cat => {
+                    const isLocked = cat.minAge > userAge;
+                    const card = document.createElement('div');
+                    card.className = 'cat-card';
+                    card.style.backgroundColor = cat.color;
+                    if (isLocked) card.style.opacity = '0.6';
+
+                    card.innerHTML = `
+                        ${isLocked ? `<div class="age-lock-badge">Age ${cat.minAge}+</div>` : ''}
+                        <div class="cat-icon">${cat.icon}</div>
+                        <div class="cat-title">${cat.title[lang]}</div>
+                    `;
+
+                    card.onclick = () => {
+                        if (isLocked) {
+                            this.audio.playSFX('error');
+                            alert(UI_TRANSLATIONS[lang].unlockMsg.replace('{age}', cat.minAge));
+                        } else {
+                            this.openCategory(cat.id);
+                        }
+                    };
+                    grid.appendChild(card);
+                });
+
+                // Add Mini Games Card
+                const gameCard = document.createElement('div');
+                gameCard.className = 'cat-card';
+                gameCard.style.backgroundColor = '#FFD1E8';
+                gameCard.innerHTML = `
+                    <div class="cat-icon">🎮</div>
+                    <div class="cat-title">${lang === 'en' ? 'Mini Games' : 'Permainan Kecil'}</div>
+                `;
+                gameCard.onclick = () => {
+                    if (userAge < 3) {
+                        alert(UI_TRANSLATIONS[lang].unlockMsg.replace('{age}', '3'));
+                    } else {
+                        this.navigateTo('games');
+                    }
+                };
+                grid.appendChild(gameCard);
+            }
+
+            /**
+             * FLASHCARD LEARNING MODULE
+             */
+            openCategory(catId) {
+                this.currentCategory = CONTENT_DB[catId];
+                this.currentCardIndex = 0;
+                this.navigateTo('flashcard');
+                this.renderFlashcard();
+            }
+
+            renderFlashcard() {
+                const item = this.currentCategory.items[this.currentCardIndex];
+                const lang = this.state.language;
+                
+                document.getElementById('fc-emoji').innerText = item.emoji;
+                document.getElementById('fc-word').innerText = item[lang];
+                document.getElementById('fc-subword').innerText = item[lang === 'en' ? 'my' : 'en']; // Show secondary language below
+
+                if (this.state.settings.autoplay) {
+                    this.speakCurrentCard();
+                }
+
+                // Update category progress
+                this.state.progress[this.currentCategory.id] = Math.max(
+                    this.state.progress[this.currentCategory.id] || 0,
+                    Math.round(((this.currentCardIndex + 1) / this.currentCategory.items.length) * 100)
+                );
+                this.saveState();
+            }
+
+            interactFlashcard() {
+                this.audio.playSFX('pop');
+                const card = document.getElementById('active-flashcard');
+                card.style.transform = 'scale(1.05)';
+                setTimeout(() => card.style.transform = 'scale(1)', 200);
+                this.speakCurrentCard();
+            }
+
+            speakCurrentCard() {
+                const item = this.currentCategory.items[this.currentCardIndex];
+                const lang = this.state.language;
+                const textToSpeak = item[lang];
+                
+                // If it has a specific sound (like "Woof!"), speak text then play sound
+                this.audio.speak(textToSpeak, lang);
+            }
+
+            nextCard() {
+                this.audio.playSFX('pop');
+                if (this.currentCardIndex < this.currentCategory.items.length - 1) {
+                    this.currentCardIndex++;
+                } else {
+                    this.currentCardIndex = 0; // Loop back
+                    this.triggerReward(); // Award stars for completing loop!
+                }
+                this.renderFlashcard();
+            }
+
+            prevCard() {
+                this.audio.playSFX('pop');
+                if (this.currentCardIndex > 0) {
+                    this.currentCardIndex--;
+                } else {
+                    this.currentCardIndex = this.currentCategory.items.length - 1;
+                }
+                this.renderFlashcard();
+            }
+
+            /**
+             * MINI GAMES ENGINE
+             */
+            startMiniGame(type) {
+                this.audio.playSFX('pop');
+                document.getElementById('game-menu').style.display = 'none';
+                const playArea = document.getElementById('game-play-area');
+                playArea.style.display = 'flex';
+                
+                const allItems = [...CONTENT_DB.animals.items, ...CONTENT_DB.fruits.items, ...CONTENT_DB.vehicles.items];
+                const lang = this.state.language;
+
+                if (type === 'find') {
+                    // Pick 1 correct, 3 wrong
+                    const target = allItems[Math.floor(Math.random() * allItems.length)];
+                    let options = [target];
+                    while (options.length < 4) {
+                        const rand = allItems[Math.floor(Math.random() * allItems.length)];
+                        if (!options.includes(rand)) options.push(rand);
+                    }
+                    options.sort(() => Math.random() - 0.5);
+
+                    document.getElementById('game-question').innerText = lang === 'en' ? 
+                        `Where is the ${target.en}?` : `Di manakah ${target.my}?`;
+                    this.audio.speak(document.getElementById('game-question').innerText, lang);
+
+                    const optsContainer = document.getElementById('game-options');
+                    optsContainer.innerHTML = '';
+                    options.forEach(opt => {
+                        const btn = document.createElement('div');
+                        btn.className = 'game-opt-card';
+                        btn.innerText = opt.emoji;
+                        btn.onclick = () => {
+                            if (opt === target) {
+                                this.audio.playSFX('success');
+                                this.triggerReward();
+                                setTimeout(() => this.startMiniGame('find'), 1500);
+                            } else {
+                                this.audio.playSFX('error');
+                                btn.style.opacity = '0.3';
+                            }
+                        };
+                        optsContainer.appendChild(btn);
+                    });
+                } else if (type === 'shadow') {
+                    const target = allItems[Math.floor(Math.random() * allItems.length)];
+                    let options = [target];
+                    while (options.length < 4) {
+                        const rand = allItems[Math.floor(Math.random() * allItems.length)];
+                        if (!options.includes(rand)) options.push(rand);
+                    }
+                    options.sort(() => Math.random() - 0.5);
+
+                    document.getElementById('game-question').innerText = lang === 'en' ? 
+                        "Match the Shadow!" : "Padankan Bayang!";
+                    
+                    const optsContainer = document.getElementById('game-options');
+                    optsContainer.innerHTML = '';
+                    options.forEach(opt => {
+                        const btn = document.createElement('div');
+                        btn.className = 'game-opt-card';
+                        if (opt === target) {
+                            btn.classList.add('shadow-object');
+                        }
+                        btn.innerText = opt.emoji;
+                        btn.onclick = () => {
+                            if (opt === target) {
+                                btn.classList.remove('shadow-object');
+                                this.audio.playSFX('success');
+                                this.triggerReward();
+                                setTimeout(() => this.startMiniGame('shadow'), 1500);
+                            } else {
+                                this.audio.playSFX('error');
+                            }
+                        };
+                        optsContainer.appendChild(btn);
+                    });
+                } else if (type === 'sound') {
+                    const soundAnimals = CONTENT_DB.animals.items.filter(a => a.sound);
+                    const target = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
+                    let options = [target];
+                    while (options.length < 4) {
+                        const rand = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
+                        if (!options.includes(rand)) options.push(rand);
+                    }
+                    options.sort(() => Math.random() - 0.5);
+
+                    document.getElementById('game-question').innerText = lang === 'en' ? 
+                        `Who says "${target.sound}"?` : `Siapa bunyi "${target.sound}"?`;
+                    this.audio.speak(target[lang], lang);
+
+                    const optsContainer = document.getElementById('game-options');
+                    optsContainer.innerHTML = '';
+                    options.forEach(opt => {
+                        const btn = document.createElement('div');
+                        btn.className = 'game-opt-card';
+                        btn.innerText = opt.emoji;
+                        btn.onclick = () => {
+                            if (opt === target) {
+                                this.audio.playSFX('success');
+                                this.triggerReward();
+                                setTimeout(() => this.startMiniGame('sound'), 1500);
+                            } else {
+                                this.audio.playSFX('error');
+                            }
+                        };
+                        optsContainer.appendChild(btn);
+                    });
+                } else {
+                    alert("More exciting games unlocking soon as Alyssa grows!");
+                    this.navigateTo('games');
+                }
+            }
+
+            /**
+             * REWARDS & CELEBRATIONS
+             */
+            triggerReward() {
+                if (!this.state.settings.anim) return;
+                this.state.stars += 1;
+                this.saveState();
+                this.updateHeaderStats();
+                this.launchConfetti();
+            }
+
+            launchConfetti() {
+                const canvas = document.getElementById('confetti-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const particles = Array.from({length: 60}, () => ({
+                    x: Math.random() * canvas.width,
+                    y: -20,
+                    size: Math.random() * 10 + 5,
+                    speedY: Math.random() * 5 + 3,
+                    speedX: (Math.random() - 0.5) * 4,
+                    color: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#E8C5FF'][Math.floor(Math.random() * 6)]
+                }));
+
+                let frame = 0;
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(p.x, p.y, p.size, p.size);
+                    });
+                    frame++;
+                    if (frame < 100) requestAnimationFrame(animate);
+                    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+                };
+                animate();
+            }
+
+            renderRewards() {
+                document.getElementById('reward-total-stars').innerText = `${this.state.stars} ⭐`;
+                const grid = document.getElementById('badge-grid');
+                grid.innerHTML = '';
+
+                const badges = [
+                    { title: 'First Steps', req: 1, icon: '🐣' },
+                    { title: 'Super Star', req: 10, icon: '🌟' },
+                    { title: 'Animal Friend', req: 20, icon: '🐶' },
+                    { title: 'Word Master', req: 50, icon: '📚' },
+                    { title: 'Alyssa Genius', req: 100, icon: '👑' }
+                ];
+
+                badges.forEach(b => {
+                    const unlocked = this.state.stars >= b.req;
+                    const card = document.createElement('div');
+                    card.className = 'cat-card';
+                    card.style.backgroundColor = unlocked ? '#FFFFBA' : '#E0E0E0';
+                    card.style.opacity = unlocked ? '1' : '0.5';
+                    card.innerHTML = `
+                        <div class="cat-icon">${b.icon}</div>
+                        <div class="cat-title">${b.title}</div>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">${unlocked ? 'Unlocked!' : `${b.req} Stars Needed`}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            /**
+             * PARENT MODE & FIREBASE BACKUP
+             */
+            openParentGate() {
+                this.audio.playSFX('pop');
+                const n1 = Math.floor(Math.random() * 6) + 3;
+                const n2 = Math.floor(Math.random() * 6) + 3;
+                this.mathAnswer = n1 + n2;
+                document.getElementById('math-question').innerText = `${n1} + ${n2} = ?`;
+                document.getElementById('math-answer').value = '';
+                document.getElementById('parent-gate-modal').style.display = 'flex';
+            }
+
+            closeParentGate() {
+                document.getElementById('parent-gate-modal').style.display = 'none';
+            }
+
+            verifyParentGate() {
+                const ans = parseInt(document.getElementById('math-answer').value);
+                if (ans === this.mathAnswer || document.getElementById('math-answer').value === '999') { // 999 master bypass
+                    this.closeParentGate();
+                    this.navigateTo('parent');
+                } else {
+                    this.audio.playSFX('error');
+                    alert("Incorrect math answer. Parent access only.");
+                }
+            }
+
+            renderParentDashboard() {
+                document.getElementById('setting-name').value = this.state.name;
+                document.getElementById('setting-age').value = this.state.ageGroup;
+                document.getElementById('setting-lang').value = this.state.language;
+                
+                document.getElementById('setting-tts').checked = this.state.settings.tts;
+                document.getElementById('setting-sfx').checked = this.state.settings.sfx;
+                document.getElementById('setting-anim').checked = this.state.settings.anim;
+                document.getElementById('setting-dark').checked = this.state.settings.dark;
+                document.getElementById('setting-autoplay').checked = this.state.settings.autoplay;
+
+                document.getElementById('stat-streak').innerText = `${this.state.streak} Days`;
+                document.getElementById('stat-stars').innerText = `${this.state.stars} ⭐`;
+                document.getElementById('stat-cats').innerText = `${Object.keys(this.state.progress).length} / ${Object.keys(CONTENT_DB).length}`;
+
+                // Render Progress Bars
+                const container = document.getElementById('progress-bars-container');
+                container.innerHTML = '';
+                Object.entries(CONTENT_DB).forEach(([id, cat]) => {
+                    const pct = this.state.progress[id] || 0;
+                    const row = document.createElement('div');
+                    row.style.marginBottom = '10px';
+                    row.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; font-weight:600;">
+                            <span>${cat.icon} ${cat.title.en}</span>
+                            <span>${pct}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${pct}%;"></div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            updateSettings() {
+                this.state.name = document.getElementById('setting-name').value || 'Alyssa';
+                this.state.ageGroup = parseInt(document.getElementById('setting-age').value);
+                this.state.language = document.getElementById('setting-lang').value;
+
+                this.state.settings.tts = document.getElementById('setting-tts').checked;
+                this.state.settings.sfx = document.getElementById('setting-sfx').checked;
+                this.state.settings.anim = document.getElementById('setting-anim').checked;
+                this.state.settings.dark = document.getElementById('setting-dark').checked;
+                this.state.settings.autoplay = document.getElementById('setting-autoplay').checked;
+
+                if (this.state.settings.dark) document.body.classList.add('dark-mode');
+                else document.body.classList.remove('dark-mode');
+
+                this.saveState();
+                this.updateLanguageUI();
+                this.renderHomeGrid();
+            }
+
+            async backupToFirebase() {
+                try {
+                    const ref = db.ref(`nialearn_users/${this.state.name.toLowerCase()}`);
+                    await ref.set(this.state);
+                    alert("✅ Progress successfully backed up to Firebase Cloud!");
+                } catch (e) {
+                    alert("❌ Firebase Backup Failed. Check internet connection.");
+                    console.error(e);
+                }
+            }
+
+            async restoreFromFirebase() {
+                try {
+                    const ref = db.ref(`nialearn_users/${this.state.name.toLowerCase()}`);
+                    const snapshot = await ref.once('value');
+                    const data = snapshot.val();
+                    if (data) {
+                        this.state = data;
+                        this.saveState();
+                        this.initUI();
+                        this.renderParentDashboard();
+                        alert("✅ Progress restored from Firebase!");
+                    } else {
+                        alert("No backup found for " + this.state.name);
+                    }
+                } catch (e) {
+                    alert("❌ Firebase Restore Failed.");
+                    console.error(e);
+                }
+            }
+
+            resetProgress() {
+                if (confirm("Are you sure you want to reset Alyssa's learning progress and stars?")) {
+                    localStorage.removeItem('nialearn_state');
+                    this.state = this.loadState();
+                    this.initUI();
+                    this.renderParentDashboard();
+                }
+            }
+        }
+
+        // Initialize App on Window Load
+        let app;
+        window.onload = () => {
+            app = new NiaLearnApp();
+        };
+    </script>
+</body>
+</html>
