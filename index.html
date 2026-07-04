@@ -430,6 +430,25 @@
             cursor: default;
         }
 
+        /* Age Pick Screen */
+        .agepick-caption {
+            font-size: 0.85rem;
+            margin-top: 6px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Math equation flashcards need a smaller hero font to avoid overflow */
+        .flashcard-emoji.fc-equation {
+            font-size: 4rem;
+        }
+
+        /* Numbers 11-20: apples wrap into rows of 10 */
+        .flashcard-subword {
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+
         /* Parent Mode Dashboard */
         .parent-header {
             display: flex;
@@ -612,7 +631,11 @@
 
         /* Responsive Layout Overrides */
         @media (max-width: 600px) {
+            header { flex-wrap: wrap; row-gap: 10px; padding: 12px 15px; }
             .brand-title { font-size: 1.4rem; }
+            .nav-controls { width: 100%; justify-content: center; gap: 10px; }
+            .btn-pill { padding: 6px 12px; font-size: 0.85rem; gap: 6px; }
+            .btn-icon { width: 38px; height: 38px; font-size: 1.2rem; }
             .welcome-banner { flex-direction: column; text-align: center; gap: 15px; }
             .category-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .flashcard { aspect-ratio: 1; }
@@ -789,7 +812,34 @@
         </div>
     </header>
 
-    <div id="screen-home" class="screen active">
+    <div id="screen-agepick" class="screen active">
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1>👋 How old is your little learner?</h1>
+                <p>Pick an age to get started!</p>
+            </div>
+        </div>
+
+        <div class="category-grid">
+            <div class="cat-card" style="background: var(--green);" onclick="app.selectAgeBand('2-3')">
+                <div class="cat-icon">🌱</div>
+                <div class="cat-title">2–3 Years</div>
+                <div class="agepick-caption">Just Getting Started? 🌱</div>
+            </div>
+            <div class="cat-card" style="background: var(--yellow);" onclick="app.selectAgeBand('3-4')">
+                <div class="cat-icon">🌟</div>
+                <div class="cat-title">3–4 Years</div>
+                <div class="agepick-caption">Growing Fast? 🌟</div>
+            </div>
+            <div class="cat-card" style="background: var(--purple);" onclick="app.selectAgeBand('4-6')">
+                <div class="cat-icon">👑</div>
+                <div class="cat-title">4–6 Years</div>
+                <div class="agepick-caption">Almost a Pro? 👑</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-home" class="screen">
         <div class="welcome-banner">
             <div class="welcome-text">
                 <h1 id="welcome-title">👋 Hello, Alyssa!</h1>
@@ -801,6 +851,18 @@
         </div>
 
         <div class="category-grid" id="category-grid">
+            </div>
+    </div>
+
+    <div id="screen-leveltopics" class="screen">
+        <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
+        <div class="welcome-banner" id="leveltopics-banner" style="background: linear-gradient(135deg, var(--green), var(--yellow));">
+            <div class="welcome-text">
+                <h1 id="leveltopics-title">🌱 Little Sprout</h1>
+                <p>Pick a topic to explore!</p>
+            </div>
+        </div>
+        <div class="category-grid" id="topic-grid">
             </div>
     </div>
 
@@ -879,12 +941,11 @@
                     <input type="text" id="setting-name" value="Alyssa" onchange="app.updateSettings()">
                 </div>
                 <div class="form-group">
-                    <label>Age Group (Unlocks progressive content):</label>
+                    <label>Age Group (Sets default learning level):</label>
                     <select id="setting-age" onchange="app.updateSettings()">
-                        <option value="2">2–3 Years (Tap & Vocab Only)</option>
-                        <option value="3">3–4 Years (+ Matching & Shapes)</option>
-                        <option value="4">4–5 Years (+ Alphabet & Numbers)</option>
-                        <option value="5">5–6 Years (+ Memory & Quizzes)</option>
+                        <option value="2-3">2–3 Years (Just Getting Started? 🌱)</option>
+                        <option value="3-4">3–4 Years (Growing Fast? 🌟)</option>
+                        <option value="4-6">4–6 Years (Almost a Pro? 👑)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1003,9 +1064,21 @@
         /**
          * CURRICULUM CONTENT DATABASE (Grow With Me Tiers included)
          */
+        // Helper: build counting-object rows, wrapping every 10 (so 11-20 don't just cap at 10)
+        function buildCountRows(n, emoji = '🍎') {
+            const rows = [];
+            let remaining = n;
+            while (remaining > 0) {
+                const take = Math.min(remaining, 10);
+                rows.push(emoji.repeat(take));
+                remaining -= take;
+            }
+            return rows.join('\n');
+        }
+
         const CONTENT_DB = {
             animals: {
-                id: 'animals', icon: '🐶', color: '#FFB3BA', minAge: 2,
+                id: 'animals', icon: '🐶', color: '#FFB3BA', type: 'picture',
                 title: { en: 'Animals', my: 'Haiwan' },
                 items: [
                     { emoji: '🐶', en: 'Dog', my: 'Anjing', sound: 'Woof Woof!' },
@@ -1023,7 +1096,7 @@
                 ]
             },
             fruits: {
-                id: 'fruits', icon: '🍎', color: '#FFDFBA', minAge: 2,
+                id: 'fruits', icon: '🍎', color: '#FFDFBA', type: 'picture',
                 title: { en: 'Fruits', my: 'Buah-buahan' },
                 items: [
                     { emoji: '🍎', en: 'Apple', my: 'Epal' },
@@ -1036,7 +1109,7 @@
                 ]
             },
             vegetables: {
-                id: 'vegetables', icon: '🥦', color: '#BAFFC9', minAge: 2,
+                id: 'vegetables', icon: '🥦', color: '#BAFFC9', type: 'picture',
                 title: { en: 'Vegetables', my: 'Sayur-sayuran' },
                 items: [
                     { emoji: '🥦', en: 'Broccoli', my: 'Brokoli' },
@@ -1047,7 +1120,7 @@
                 ]
             },
             vehicles: {
-                id: 'vehicles', icon: '🚗', color: '#BAE1FF', minAge: 2,
+                id: 'vehicles', icon: '🚗', color: '#BAE1FF', type: 'picture',
                 title: { en: 'Vehicles', my: 'Kenderaan' },
                 items: [
                     { emoji: '🚗', en: 'Car', my: 'Kereta', sound: 'Beep Beep!' },
@@ -1059,7 +1132,7 @@
                 ]
             },
             house: {
-                id: 'house', icon: '🏠', color: '#E8C5FF', minAge: 2,
+                id: 'house', icon: '🏠', color: '#E8C5FF', type: 'picture',
                 title: { en: 'Inside the House', my: 'Dalam Rumah' },
                 items: [
                     { emoji: '🛏️', en: 'Bed', my: 'Katil' },
@@ -1073,7 +1146,7 @@
                 ]
             },
             outdoor: {
-                id: 'outdoor', icon: '🌳', color: '#FFFFBA', minAge: 3,
+                id: 'outdoor', icon: '🌳', color: '#FFFFBA', type: 'picture',
                 title: { en: 'Outdoor Objects', my: 'Objek Luar' },
                 items: [
                     { emoji: '🌳', en: 'Tree', my: 'Pokok' },
@@ -1086,7 +1159,7 @@
                 ]
             },
             colors: {
-                id: 'colors', icon: '🎨', color: '#FFB3BA', minAge: 3,
+                id: 'colors', icon: '🎨', color: '#FFB3BA', type: 'picture',
                 title: { en: 'Colors', my: 'Warna' },
                 items: [
                     { emoji: '🔴', en: 'Red', my: 'Merah' },
@@ -1100,7 +1173,7 @@
                 ]
             },
             shapes: {
-                id: 'shapes', icon: '⭐', color: '#FFDFBA', minAge: 3,
+                id: 'shapes', icon: '⭐', color: '#FFDFBA', type: 'picture',
                 title: { en: 'Shapes', my: 'Bentuk' },
                 items: [
                     { emoji: '⭕', en: 'Circle', my: 'Bulatan' },
@@ -1113,7 +1186,7 @@
                 ]
             },
             numbers: {
-                id: 'numbers', icon: '🔢', color: '#BAFFC9', minAge: 2,
+                id: 'numbers', icon: '🔢', color: '#BAFFC9', type: 'number',
                 title: { en: 'Numbers (1-20)', my: 'Nombor (1-20)' },
                 items: Array.from({length: 20}, (_, i) => {
                     const wordsEn = ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
@@ -1124,12 +1197,12 @@
                         digit: `${i + 1}`,
                         en: wordsEn[i],
                         my: wordsMy[i],
-                        sub: '🍎'.repeat(Math.min(i + 1, 10))
+                        sub: buildCountRows(i + 1) // rows of 10 apples, correct count for 11-20
                     };
                 })
             },
             alphabet: {
-                id: 'alphabet', icon: '🔤', color: '#BAE1FF', minAge: 2,
+                id: 'alphabet', icon: '🔤', color: '#BAE1FF', type: 'letter',
                 title: { en: 'Alphabet (A-Z)', my: 'Abjad (A-Z)' },
                 items: [
                     { letter: 'A', emoji: '🍎', en: 'Apple', my: 'Epal' },
@@ -1161,7 +1234,7 @@
                 ]
             },
             family: {
-                id: 'family', icon: '👨‍👩‍👧', color: '#E8C5FF', minAge: 2,
+                id: 'family', icon: '👨‍👩‍👧', color: '#E8C5FF', type: 'picture',
                 title: { en: 'Family Members', my: 'Ahli Keluarga' },
                 items: [
                     { emoji: '👨', en: 'Father', my: 'Ayah' },
@@ -1174,7 +1247,7 @@
                 ]
             },
             clothes: {
-                id: 'clothes', icon: '👕', color: '#FFB3BA', minAge: 3,
+                id: 'clothes', icon: '👕', color: '#FFB3BA', type: 'picture',
                 title: { en: 'Clothes', my: 'Pakaian' },
                 items: [
                     { emoji: '👕', en: 'Shirt', my: 'Baju' },
@@ -1186,7 +1259,7 @@
                 ]
             },
             food: {
-                id: 'food', icon: '🍽️', color: '#FFDFBA', minAge: 2,
+                id: 'food', icon: '🍽️', color: '#FFDFBA', type: 'picture',
                 title: { en: 'Food', my: 'Makanan' },
                 items: [
                     { emoji: '🍚', en: 'Rice', my: 'Nasi' },
@@ -1198,7 +1271,7 @@
                 ]
             },
             toys: {
-                id: 'toys', icon: '🧸', color: '#BAFFC9', minAge: 2,
+                id: 'toys', icon: '🧸', color: '#BAFFC9', type: 'picture',
                 title: { en: 'Toys', my: 'Mainan' },
                 items: [
                     { emoji: '🧸', en: 'Teddy Bear', my: 'Patung Beruang' },
@@ -1208,7 +1281,119 @@
                     { emoji: '🪁', en: 'Kite', my: 'Layang-layang' },
                     { emoji: '🎨', en: 'Crayons', my: 'Krayon' }
                 ]
+            },
+            words_cvc: {
+                id: 'words_cvc', icon: '🔤', color: '#FFDFBA', type: 'word',
+                title: { en: 'Simple Words', my: 'Perkataan Mudah' },
+                items: [
+                    { emoji: '🐱', word: 'CAT' },
+                    { emoji: '🐶', word: 'DOG' },
+                    { emoji: '☀️', word: 'SUN' },
+                    { emoji: '🎩', word: 'HAT' },
+                    { emoji: '🐷', word: 'PIG' },
+                    { emoji: '🚌', word: 'BUS' },
+                    { emoji: '☕', word: 'CUP' },
+                    { emoji: '🛏️', word: 'BED' }
+                ]
+            },
+            words_4letter: {
+                id: 'words_4letter', icon: '📖', color: '#BAE1FF', type: 'word',
+                title: { en: 'More Words', my: 'Lebih Perkataan' },
+                items: [
+                    { emoji: '🐟', word: 'FISH' },
+                    { emoji: '🐦', word: 'BIRD' },
+                    { emoji: '⭐', word: 'STAR' },
+                    { emoji: '⚽', word: 'BALL' },
+                    { emoji: '🌳', word: 'TREE' },
+                    { emoji: '🥛', word: 'MILK' },
+                    { emoji: '📖', word: 'BOOK' },
+                    { emoji: '🦆', word: 'DUCK' }
+                ]
+            },
+            math_basic: {
+                id: 'math_basic', icon: '➕', color: '#BAFFC9', type: 'math',
+                title: { en: 'Simple Addition', my: 'Tambah Mudah' },
+                items: [1,2,3,4,5].map((a, idx) => {
+                    const b = [1,1,2,2,3][idx];
+                    return {
+                        equation: `${a} + ${b}`,
+                        answer: `= ${a + b}`,
+                        visual: `${'🍎'.repeat(a)} + ${'🍎'.repeat(b)}`
+                    };
+                })
+            },
+            math_10: {
+                id: 'math_10', icon: '🧮', color: '#E8C5FF', type: 'math',
+                title: { en: 'Add & Subtract to 10', my: 'Tambah & Tolak hingga 10' },
+                items: [
+                    { equation: '7 + 3', answer: '= 10', visual: '🍎🍎🍎🍎🍎🍎🍎 + 🍎🍎🍎' },
+                    { equation: '6 + 4', answer: '= 10', visual: '🍎🍎🍎🍎🍎🍎 + 🍎🍎🍎🍎' },
+                    { equation: '5 + 5', answer: '= 10', visual: '🍎🍎🍎🍎🍎 + 🍎🍎🍎🍎🍎' },
+                    { equation: '2 + 8', answer: '= 10', visual: '🍎🍎 + 🍎🍎🍎🍎🍎🍎🍎🍎' },
+                    { equation: '10 - 4', answer: '= 6', visual: '' },
+                    { equation: '10 - 7', answer: '= 3', visual: '' },
+                    { equation: '9 - 2', answer: '= 7', visual: '' },
+                    { equation: '8 - 3', answer: '= 5', visual: '' }
+                ]
+            },
+            sight_words: {
+                id: 'sight_words', icon: '👀', color: '#FFB3BA', type: 'sight',
+                title: { en: 'Sight Words', my: 'Perkataan Kerap' },
+                items: [
+                    { word: 'THE', example: 'I see THE cat.' },
+                    { word: 'AND', example: 'Cat AND dog.' },
+                    { word: 'IS', example: 'It IS big.' },
+                    { word: 'YOU', example: 'I love YOU.' },
+                    { word: 'SEE', example: 'I SEE a star.' },
+                    { word: 'GO', example: "Let's GO!" },
+                    { word: 'LOOK', example: 'LOOK at this!' },
+                    { word: 'STOP', example: 'STOP right there.' }
+                ]
             }
+        };
+
+        // Slice helper: build a sub-category that reuses a base category's items
+        function sliceCategory(baseId, newId, title, start, end) {
+            const base = CONTENT_DB[baseId];
+            return {
+                id: newId, icon: base.icon, color: base.color, type: base.type,
+                title, items: base.items.slice(start, end)
+            };
+        }
+
+        CONTENT_DB.numbers_1_10 = sliceCategory('numbers', 'numbers_1_10', { en: 'Numbers 1-10', my: 'Nombor 1-10' }, 0, 10);
+        CONTENT_DB.numbers_11_20 = sliceCategory('numbers', 'numbers_11_20', { en: 'Numbers 11-20', my: 'Nombor 11-20' }, 10, 20);
+        CONTENT_DB.alphabet_a_e = sliceCategory('alphabet', 'alphabet_a_e', { en: 'Alphabet A-E', my: 'Abjad A-E' }, 0, 5);
+        CONTENT_DB.alphabet_a_m = sliceCategory('alphabet', 'alphabet_a_m', { en: 'Alphabet A-M', my: 'Abjad A-M' }, 0, 13);
+        CONTENT_DB.alphabet_n_z = sliceCategory('alphabet', 'alphabet_n_z', { en: 'Alphabet N-Z', my: 'Abjad N-Z' }, 13, 26);
+        CONTENT_DB.shapes_basic = sliceCategory('shapes', 'shapes_basic', { en: 'Basic Shapes', my: 'Bentuk Asas' }, 0, 5);
+        CONTENT_DB.shapes_advanced = sliceCategory('shapes', 'shapes_advanced', { en: 'Advanced Shapes', my: 'Bentuk Lanjutan' }, 5, 7);
+
+        /**
+         * TIER MAP: which topics appear under each Age Band -> Level
+         */
+        const TIER_CONTENT = {
+            '2-3': {
+                sprout: ['animals', 'fruits', 'vegetables', 'colors', 'family', 'shapes_basic'],
+                star: ['house', 'vehicles', 'clothes', 'food', 'toys'],
+                champion: ['numbers', 'alphabet_a_e']
+            },
+            '3-4': {
+                sprout: ['animals', 'fruits', 'vegetables', 'colors', 'shapes_basic'],
+                star: ['numbers_1_10', 'alphabet_a_m', 'vehicles', 'outdoor'],
+                champion: ['numbers_11_20', 'alphabet_n_z', 'words_cvc']
+            },
+            '4-6': {
+                sprout: ['numbers', 'alphabet'],
+                star: ['words_cvc', 'words_4letter', 'math_basic'],
+                champion: ['shapes_advanced', 'sight_words', 'math_10']
+            }
+        };
+
+        const LEVEL_META = {
+            sprout: { name: 'Little Sprout', icon: '🌱', color: 'var(--green)' },
+            star: { name: 'Rising Star', icon: '🌟', color: 'var(--yellow)' },
+            champion: { name: 'Champion', icon: '👑', color: 'var(--purple)' }
         };
 
         /**
@@ -1317,7 +1502,7 @@
             loadState() {
                 const defaultState = {
                     name: 'Alyssa',
-                    ageGroup: 3, // Default age 3 (Grow with me mode)
+                    ageBand: null, // '2-3' | '3-4' | '4-6' — null means show the Age Pick screen
                     language: 'en',
                     stars: 0,
                     streak: 1,
@@ -1342,6 +1527,12 @@
                 this.updateLanguageUI();
                 this.renderHomeGrid();
                 this.updateHeaderStats();
+
+                // Returning users who already picked an age band skip straight to Home
+                // (silent = true avoids trying to play a sound before any user gesture)
+                if (this.state.ageBand) {
+                    this.navigateTo('home', true);
+                }
 
                 // Check daily streak
                 const oneDay = 86400000;
@@ -1393,8 +1584,8 @@
                 });
             }
 
-            navigateTo(screenId) {
-                this.audio.playSFX('pop');
+            navigateTo(screenId, silent = false) {
+                if (!silent) this.audio.playSFX('pop');
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById(`screen-${screenId}`).classList.add('active');
 
@@ -1453,34 +1644,21 @@
                 const grid = document.getElementById('category-grid');
                 grid.innerHTML = '';
                 const lang = this.state.language;
-                const userAge = parseInt(this.state.ageGroup);
 
-                // Add regular categories
-                Object.values(CONTENT_DB).forEach(cat => {
-                    const isLocked = cat.minAge > userAge;
+                // Add the 3 tier level cards
+                Object.entries(LEVEL_META).forEach(([key, meta]) => {
                     const card = document.createElement('div');
                     card.className = 'cat-card';
-                    card.style.backgroundColor = cat.color;
-                    if (isLocked) card.style.opacity = '0.6';
-
+                    card.style.backgroundColor = meta.color;
                     card.innerHTML = `
-                        ${isLocked ? `<div class="age-lock-badge">Age ${cat.minAge}+</div>` : ''}
-                        <div class="cat-icon">${cat.icon}</div>
-                        <div class="cat-title">${cat.title[lang]}</div>
+                        <div class="cat-icon">${meta.icon}</div>
+                        <div class="cat-title">${meta.name}</div>
                     `;
-
-                    card.onclick = () => {
-                        if (isLocked) {
-                            this.audio.playSFX('error');
-                            alert(UI_TRANSLATIONS[lang].unlockMsg.replace('{age}', cat.minAge));
-                        } else {
-                            this.openCategory(cat.id);
-                        }
-                    };
+                    card.onclick = () => this.openLevel(key);
                     grid.appendChild(card);
                 });
 
-                // Add Mini Games Card
+                // Add Mini Games Card (always accessible)
                 const gameCard = document.createElement('div');
                 gameCard.className = 'cat-card';
                 gameCard.style.backgroundColor = '#FFD1E8';
@@ -1488,14 +1666,51 @@
                     <div class="cat-icon">🎮</div>
                     <div class="cat-title">${lang === 'en' ? 'Mini Games' : 'Permainan Kecil'}</div>
                 `;
-                gameCard.onclick = () => {
-                    if (userAge < 3) {
-                        alert(UI_TRANSLATIONS[lang].unlockMsg.replace('{age}', '3'));
-                    } else {
-                        this.navigateTo('games');
-                    }
-                };
+                gameCard.onclick = () => this.navigateTo('games');
                 grid.appendChild(gameCard);
+            }
+
+            /**
+             * LEVEL & TOPIC SELECTION (Age Band -> Level -> Topic)
+             */
+            selectAgeBand(band) {
+                this.audio.playSFX('cheer');
+                this.state.ageBand = band;
+                this.saveState();
+                this.navigateTo('home');
+            }
+
+            openLevel(levelKey) {
+                this.currentLevel = levelKey;
+                this.navigateTo('leveltopics');
+                this.renderLevelTopics();
+            }
+
+            renderLevelTopics() {
+                const meta = LEVEL_META[this.currentLevel];
+                document.getElementById('leveltopics-title').innerText = `${meta.icon} ${meta.name}`;
+                document.getElementById('leveltopics-banner').style.background =
+                    `linear-gradient(135deg, ${meta.color}, var(--peach))`;
+
+                const grid = document.getElementById('topic-grid');
+                grid.innerHTML = '';
+                const lang = this.state.language;
+                const band = this.state.ageBand || '2-3';
+                const topicIds = (TIER_CONTENT[band] && TIER_CONTENT[band][this.currentLevel]) || [];
+
+                topicIds.forEach(id => {
+                    const cat = CONTENT_DB[id];
+                    if (!cat) return;
+                    const card = document.createElement('div');
+                    card.className = 'cat-card';
+                    card.style.backgroundColor = cat.color;
+                    card.innerHTML = `
+                        <div class="cat-icon">${cat.icon}</div>
+                        <div class="cat-title">${cat.title[lang]}</div>
+                    `;
+                    card.onclick = () => this.openCategory(id);
+                    grid.appendChild(card);
+                });
             }
 
             /**
@@ -1511,21 +1726,38 @@
             renderFlashcard() {
                 const item = this.currentCategory.items[this.currentCardIndex];
                 const lang = this.state.language;
-                const catId = this.currentCategory.id;
+                const type = this.currentCategory.type || 'picture';
                 const emojiEl = document.getElementById('fc-emoji');
                 const wordEl = document.getElementById('fc-word');
                 const subEl = document.getElementById('fc-subword');
 
-                if (catId === 'numbers') {
-                    // Real typed digit as the hero, spelled word + counting objects below
+                emojiEl.classList.remove('fc-equation');
+
+                if (type === 'number') {
+                    // Real typed digit as the hero, spelled word + counting objects (rows of 10) below
                     emojiEl.innerText = item.digit;
                     wordEl.innerText = item[lang];
                     subEl.innerText = item.sub;
-                } else if (catId === 'alphabet') {
+                } else if (type === 'letter') {
                     // Real typed letter as the hero, picture + word below
                     emojiEl.innerText = item.letter;
                     wordEl.innerText = item[lang];
                     subEl.innerText = `${item.emoji} ${item[lang === 'en' ? 'my' : 'en']}`;
+                } else if (type === 'word') {
+                    // Real typed word as the hero, picture + phonics breakdown below
+                    emojiEl.innerText = item.word;
+                    wordEl.innerText = item.emoji;
+                    subEl.innerText = item.word.split('').join('-');
+                } else if (type === 'math') {
+                    // Equation as the hero (smaller font so it fits), answer + visual below
+                    emojiEl.innerText = item.equation;
+                    emojiEl.classList.add('fc-equation');
+                    wordEl.innerText = item.answer;
+                    subEl.innerText = item.visual || '';
+                } else if (type === 'sight') {
+                    emojiEl.innerText = '👀';
+                    wordEl.innerText = item.word;
+                    subEl.innerText = item.example;
                 } else {
                     emojiEl.innerText = item.emoji;
                     wordEl.innerText = item[lang];
@@ -1555,11 +1787,17 @@
             speakCurrentCard() {
                 const item = this.currentCategory.items[this.currentCardIndex];
                 const lang = this.state.language;
-                const catId = this.currentCategory.id;
+                const type = this.currentCategory.type || 'picture';
 
                 let textToSpeak = item[lang];
-                if (catId === 'alphabet') {
+                if (type === 'letter') {
                     textToSpeak = `${item.letter}. ${item[lang]}`;
+                } else if (type === 'word') {
+                    textToSpeak = item.word;
+                } else if (type === 'math') {
+                    textToSpeak = `${item.equation} ${item.answer}`;
+                } else if (type === 'sight') {
+                    textToSpeak = `${item.word}. ${item.example}`;
                 }
 
                 this.audio.speak(textToSpeak, lang);
@@ -1876,7 +2114,7 @@
 
             renderParentDashboard() {
                 document.getElementById('setting-name').value = this.state.name;
-                document.getElementById('setting-age').value = this.state.ageGroup;
+                document.getElementById('setting-age').value = this.state.ageBand || '2-3';
                 document.getElementById('setting-lang').value = this.state.language;
                 
                 document.getElementById('setting-tts').checked = this.state.settings.tts;
@@ -1887,12 +2125,21 @@
 
                 document.getElementById('stat-streak').innerText = `${this.state.streak} Days`;
                 document.getElementById('stat-stars').innerText = `${this.state.stars} ⭐`;
-                document.getElementById('stat-cats').innerText = `${Object.keys(this.state.progress).length} / ${Object.keys(CONTENT_DB).length}`;
 
-                // Render Progress Bars
+                // Only count topics that are actually reachable through the tier system
+                const allTopicIds = new Set();
+                Object.values(TIER_CONTENT).forEach(bandObj =>
+                    Object.values(bandObj).forEach(ids => ids.forEach(id => allTopicIds.add(id)))
+                );
+                const exploredCount = [...allTopicIds].filter(id => this.state.progress[id]).length;
+                document.getElementById('stat-cats').innerText = `${exploredCount} / ${allTopicIds.size}`;
+
+                // Render Progress Bars (only for reachable topics)
                 const container = document.getElementById('progress-bars-container');
                 container.innerHTML = '';
-                Object.entries(CONTENT_DB).forEach(([id, cat]) => {
+                allTopicIds.forEach(id => {
+                    const cat = CONTENT_DB[id];
+                    if (!cat) return;
                     const pct = this.state.progress[id] || 0;
                     const row = document.createElement('div');
                     row.style.marginBottom = '10px';
@@ -1911,7 +2158,7 @@
 
             updateSettings() {
                 this.state.name = document.getElementById('setting-name').value || 'Alyssa';
-                this.state.ageGroup = parseInt(document.getElementById('setting-age').value);
+                this.state.ageBand = document.getElementById('setting-age').value;
                 this.state.language = document.getElementById('setting-lang').value;
 
                 this.state.settings.tts = document.getElementById('setting-tts').checked;
