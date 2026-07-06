@@ -6,6 +6,7 @@
     <title>NiaLearn - Little Hands, Big Discoveries!</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
@@ -1057,6 +1058,38 @@
         </div>
 
         <div class="parent-grid">
+            <!-- ================================================
+                 PARENT ACCOUNT (Firebase Auth login/signup)
+            ================================================ -->
+            <div class="panel">
+                <h3>👤 Parent Account</h3>
+
+                <div id="account-logged-out">
+                    <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">
+                        Create an account to save progress to the cloud and unlock premium content later.
+                    </p>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="auth-email" placeholder="parent@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="auth-password" placeholder="At least 6 characters">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-pill" style="flex:1; justify-content: center; background: var(--green);" onclick="app.signUpParent()">Sign Up</button>
+                        <button class="btn-pill" style="flex:1; justify-content: center; background: var(--blue);" onclick="app.signInParent()">Log In</button>
+                    </div>
+                    <p id="auth-error" style="color: #FF6B6B; font-size: 0.85rem; margin-top: 8px;"></p>
+                </div>
+
+                <div id="account-logged-in" style="display: none;">
+                    <div class="stat-row"><span>Signed in as:</span> <strong id="account-email">-</strong></div>
+                    <div class="stat-row"><span>Plan:</span> <strong id="account-plan">Free</strong></div>
+                    <button class="btn-pill" style="width: 100%; justify-content: center; background: #FFB3BA; color: #902430;" onclick="app.signOutParent()">Log Out</button>
+                </div>
+            </div>
+
             <div class="panel">
                 <h3>👧 Child Profile & "Grow With Me"</h3>
                 <div class="form-group">
@@ -1144,6 +1177,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
 
         /**
          * MULTILINGUAL DICTIONARY & UI TRANSLATIONS
@@ -1636,6 +1670,9 @@
                     streak: 1,
                     lastLogin: Date.now(),
                     progress: {},
+                    uid: null,        // Firebase Auth user id, set once parent logs in
+                    email: null,      // Parent's email, set once parent logs in
+                    isPremium: false, // Premium/paid flag (set by future paywall step)
                     settings: {
                         tts: true, sfx: true, anim: true, dark: false, autoplay: true
                     }
@@ -2259,7 +2296,62 @@
                 }
             }
 
+            // ---- PARENT ACCOUNT (Firebase Auth: sign up / log in / log out) ----
+            signUpParent() {
+                const email = document.getElementById('auth-email').value.trim();
+                const password = document.getElementById('auth-password').value;
+                const errEl = document.getElementById('auth-error');
+                errEl.innerText = '';
+                if (!email || !password) {
+                    errEl.innerText = 'Please enter an email and password.';
+                    return;
+                }
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        // Save a starter record for this new account (free plan by default)
+                        const uid = auth.currentUser.uid;
+                        db.ref(`nialearn_users/${uid}/isPremium`).set(false);
+                    })
+                    .catch(err => { errEl.innerText = err.message; });
+            }
+
+            signInParent() {
+                const email = document.getElementById('auth-email').value.trim();
+                const password = document.getElementById('auth-password').value;
+                const errEl = document.getElementById('auth-error');
+                errEl.innerText = '';
+                if (!email || !password) {
+                    errEl.innerText = 'Please enter an email and password.';
+                    return;
+                }
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch(err => { errEl.innerText = err.message; });
+            }
+
+            signOutParent() {
+                auth.signOut();
+            }
+
+            // Called whenever login state changes (see auth.onAuthStateChanged below)
+            updateAccountUI(user) {
+                const loggedOutEl = document.getElementById('account-logged-out');
+                const loggedInEl = document.getElementById('account-logged-in');
+                if (!loggedOutEl || !loggedInEl) return; // Parent screen not rendered yet
+
+                if (user) {
+                    loggedOutEl.style.display = 'none';
+                    loggedInEl.style.display = 'block';
+                    document.getElementById('account-email').innerText = user.email;
+                    document.getElementById('account-plan').innerText = this.state.isPremium ? 'Premium ⭐' : 'Free';
+                } else {
+                    loggedOutEl.style.display = 'block';
+                    loggedInEl.style.display = 'none';
+                }
+            }
+
             renderParentDashboard() {
+                this.updateAccountUI(auth.currentUser);
+
                 document.getElementById('setting-name').value = this.state.name;
                 document.getElementById('setting-age').value = this.state.ageBand || '2-3';
                 document.getElementById('setting-lang').value = this.state.language;
@@ -2378,6 +2470,30 @@
         window.onload = () => {
             app = new NiaLearnApp();
         };
+
+        // ---- FIREBASE AUTH STATE LISTENER ----
+        // Fires whenever a parent logs in, signs up, logs out, or the page
+        // reloads while already logged in. Keeps app.state and the account
+        // panel UI in sync with the real Firebase Auth session.
+        auth.onAuthStateChanged(user => {
+            if (!app) return; // Page still loading, nothing to update yet
+
+            app.state.uid = user ? user.uid : null;
+            app.state.email = user ? user.email : null;
+
+            if (user) {
+                // Pull this parent's premium flag from the cloud
+                db.ref(`nialearn_users/${user.uid}/isPremium`).once('value').then(snap => {
+                    app.state.isPremium = snap.val() === true;
+                    app.saveState();
+                    app.updateAccountUI(user);
+                });
+            } else {
+                app.state.isPremium = false;
+                app.saveState();
+                app.updateAccountUI(null);
+            }
+        });
     </script>
 </body>
 </html>
