@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* ========================================================
+           THEME COLOURS & FONTS (change app-wide colors here)
+        ======================================================== */
         :root {
             --bg-color: #FFF9E6;
             --text-main: #4A3E3D;
@@ -54,7 +57,9 @@
             flex-direction: column;
         }
 
-        /* Top Navigation Header */
+        /* ========================================================
+           TOP HEADER (logo, star count, language, settings button)
+        ======================================================== */
         header {
             display: flex;
             justify-content: space-between;
@@ -95,9 +100,10 @@
             gap: 15px;
         }
 
+        /* ========================================================
+           BUTTONS (used across all screens)
+        ======================================================== */
         .btn-pill {
-            background: var(--bg-color);
-            border: 2px solid #E0D6CC;
             padding: 8px 16px;
             border-radius: 50px;
             font-family: var(--font-main);
@@ -158,7 +164,9 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Banner / Welcome */
+        /* ========================================================
+           HOME SCREEN / AGE PICK (welcome banner + category cards)
+        ======================================================== */
         .welcome-banner {
             background: linear-gradient(135deg, var(--pink), var(--peach));
             padding: 20px 30px;
@@ -254,7 +262,9 @@
             font-weight: 700;
         }
 
-        /* Flashcard View */
+        /* ========================================================
+           FLASHCARD SCREEN (the swipe-through learning cards)
+        ======================================================== */
         .flashcard-container {
             flex: 1;
             display: flex;
@@ -365,7 +375,9 @@
             box-shadow: none;
         }
 
-        /* Mini Games UI */
+        /* ========================================================
+           GAMES SCREEN (game menu + game board UI)
+        ======================================================== */
         .game-board {
             flex: 1;
             display: flex;
@@ -516,7 +528,9 @@
             line-height: 1.4;
         }
 
-        /* Parent Mode Dashboard */
+        /* ========================================================
+           PARENT DASHBOARD (settings, stats, progress bars)
+        ======================================================== */
         .parent-header {
             display: flex;
             justify-content: space-between;
@@ -607,7 +621,9 @@
             accent-color: #FF6B6B;
         }
 
-        /* Modals & Overlays */
+        /* ========================================================
+           MODALS (Parent PIN gate popup, etc.)
+        ======================================================== */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -839,6 +855,9 @@
 </head>
 <body>
 
+    <!-- ============================================================
+         SPLASH SCREEN (first thing kids see when app opens)
+    ============================================================ -->
     <div id="cover-screen">
         <div class="cover-blob cover-blob1"></div>
         <div class="cover-blob cover-blob2"></div>
@@ -861,6 +880,9 @@
 
     <canvas id="confetti-canvas"></canvas>
 
+    <!-- ============================================================
+         TOP HEADER (shows on every screen: logo, stars, lang, settings)
+    ============================================================ -->
     <header>
         <div class="brand" onclick="app.navigateTo('home')">
             <span class="brand-title">✨ NiaLearn</span>
@@ -879,6 +901,9 @@
         </div>
     </header>
 
+    <!-- ============================================================
+         SCREEN: AGE PICK (first screen new users see — choose age band)
+    ============================================================ -->
     <div id="screen-agepick" class="screen active">
         <div class="welcome-banner">
             <div class="welcome-text">
@@ -915,6 +940,9 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: HOME (3 level tiers: Little Sprout / Rising Star / Champion)
+    ============================================================ -->
     <div id="screen-home" class="screen">
         <div class="welcome-banner">
             <div class="welcome-text">
@@ -934,6 +962,9 @@
             </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: LEVEL TOPICS (topics inside a chosen level, e.g. Little Sprout)
+    ============================================================ -->
     <div id="screen-leveltopics" class="screen">
         <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
         <div class="welcome-banner" id="leveltopics-banner" style="background: linear-gradient(135deg, var(--green), var(--yellow));">
@@ -946,6 +977,9 @@
             </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: FLASHCARD (swipe through words in a topic)
+    ============================================================ -->
     <div id="screen-flashcard" class="screen">
         <button class="back-btn" onclick="app.navigateTo('leveltopics')">⬅ <span class="ui-back">Back</span></button>
         <div class="flashcard-container">
@@ -962,6 +996,9 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: GAMES (mini-game menu + game play area)
+    ============================================================ -->
     <div id="screen-games" class="screen">
         <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
         <div id="game-menu" class="category-grid">
@@ -988,6 +1025,9 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: REWARDS (trophy room / achievement badges)
+    ============================================================ -->
     <div id="screen-rewards" class="screen">
         <button class="back-btn" onclick="app.navigateTo('home')">⬅ <span class="ui-back">Back</span></button>
         <div class="welcome-banner" style="background: linear-gradient(135deg, var(--yellow), var(--purple));">
@@ -1004,6 +1044,9 @@
             </div>
     </div>
 
+    <!-- ============================================================
+         SCREEN: PARENT DASHBOARD (settings, stats, progress, PIN-gated)
+    ============================================================ -->
     <div id="screen-parent" class="screen">
         <div class="parent-header">
             <div>
@@ -1067,6 +1110,9 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         MODAL: Parent PIN Gate (math question to stop kids entering)
+    ============================================================ -->
     <div class="modal-overlay" id="parent-gate-modal">
         <div class="modal">
             <h2>🔒 Parent Access Only</h2>
@@ -1666,6 +1712,7 @@
                 });
             }
 
+            // ---- NAVIGATION (switching between screens) ----
             navigateTo(screenId, silent = false) {
                 if (!silent) this.audio.playSFX('pop');
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
