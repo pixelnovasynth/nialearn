@@ -903,9 +903,82 @@
     </header>
 
     <!-- ============================================================
+         SCREEN: AUTH GATE (login/signup — must happen before anything else)
+    ============================================================ -->
+    <div id="screen-authgate" class="screen active">
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1>🐣 Welcome to NiaLearn</h1>
+                <p>Sign up or log in to get started.</p>
+            </div>
+        </div>
+        <div class="panel" style="max-width: 420px; margin: 0 auto; width: 100%;">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="gate-auth-email" placeholder="parent@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="gate-auth-password" placeholder="At least 6 characters">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-pill" style="flex:1; justify-content: center; background: var(--green);" onclick="app.signUpParent()">Sign Up</button>
+                <button class="btn-pill" style="flex:1; justify-content: center; background: var(--blue);" onclick="app.signInParent()">Log In</button>
+            </div>
+            <p id="gate-auth-error" style="color: #FF6B6B; font-size: 0.85rem; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SCREEN: PAYWALL (one-time payment — must happen before use)
+    ============================================================ -->
+    <div id="screen-paywall" class="screen">
+        <div class="welcome-banner" style="background: linear-gradient(135deg, var(--yellow), var(--purple));">
+            <div class="welcome-text">
+                <h1>🔓 Unlock NiaLearn</h1>
+                <p>One-time payment. Use it forever, on any device.</p>
+            </div>
+        </div>
+        <div class="panel" style="max-width: 420px; margin: 0 auto; width: 100%; text-align: center;">
+            <p style="margin-bottom: 15px; color: var(--text-light);">Signed in as <strong id="paywall-email">-</strong></p>
+            <button class="btn-pill" style="width: 100%; justify-content: center; background: var(--yellow); font-size: 1.2rem; padding: 16px;" onclick="app.buyFullAccess()">
+                💳 Buy Full Access
+            </button>
+            <button class="btn-pill" style="width: 100%; justify-content: center; margin-top: 12px; background: var(--bg-color);" onclick="app.signOutParent()">
+                Log Out
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SCREEN: CHILD SELECT (choose which child, or add a new one)
+    ============================================================ -->
+    <div id="screen-childselect" class="screen">
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1>👨‍👩‍👧 Who's Learning Today?</h1>
+                <p>Pick a profile, or add a new one.</p>
+            </div>
+        </div>
+        <div class="list-menu" id="childselect-list"></div>
+        <div class="panel" style="max-width: 420px; margin: 15px auto 0; width: 100%;">
+            <div class="form-group">
+                <label>New child's name:</label>
+                <input type="text" id="new-child-name" placeholder="e.g. Adam">
+            </div>
+            <button class="btn-pill" style="width: 100%; justify-content: center; background: var(--green);" onclick="app.addChildFromInput()">
+                ➕ Add Child
+            </button>
+            <button class="btn-pill" style="width: 100%; justify-content: center; margin-top: 10px; background: var(--bg-color);" onclick="app.signOutParent()">
+                Log Out
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
          SCREEN: AGE PICK (first screen new users see — choose age band)
     ============================================================ -->
-    <div id="screen-agepick" class="screen active">
+    <div id="screen-agepick" class="screen">
         <div class="welcome-banner">
             <div class="welcome-text">
                 <h1>👋 How old is your little learner?</h1>
@@ -955,9 +1028,14 @@
             </div>
         </div>
 
-        <button class="btn-pill" style="align-self: center; margin-bottom: 15px; background: var(--blue);" onclick="app.navigateTo('agepick')">
-            🔄 <span class="ui-change-age">Change Age Group</span>
-        </button>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+            <button class="btn-pill" style="background: var(--blue);" onclick="app.navigateTo('agepick')">
+                🔄 <span class="ui-change-age">Change Age Group</span>
+            </button>
+            <button class="btn-pill" style="background: var(--purple);" onclick="app.goToChildSelect()">
+                👨‍👩‍👧 Switch Child
+            </button>
+        </div>
 
         <div class="list-menu" id="category-grid">
             </div>
@@ -1059,39 +1137,18 @@
 
         <div class="parent-grid">
             <!-- ================================================
-                 PARENT ACCOUNT (Firebase Auth login/signup)
+                 PARENT ACCOUNT (read-only — login happens before
+                 the dashboard is ever reachable, so no form needed here)
             ================================================ -->
             <div class="panel">
                 <h3>👤 Parent Account</h3>
-
-                <div id="account-logged-out">
-                    <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">
-                        Create an account to save progress to the cloud and unlock premium content later.
-                    </p>
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" id="auth-email" placeholder="parent@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Password:</label>
-                        <input type="password" id="auth-password" placeholder="At least 6 characters">
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-pill" style="flex:1; justify-content: center; background: var(--green);" onclick="app.signUpParent()">Sign Up</button>
-                        <button class="btn-pill" style="flex:1; justify-content: center; background: var(--blue);" onclick="app.signInParent()">Log In</button>
-                    </div>
-                    <p id="auth-error" style="color: #FF6B6B; font-size: 0.85rem; margin-top: 8px;"></p>
-                </div>
-
-                <div id="account-logged-in" style="display: none;">
-                    <div class="stat-row"><span>Signed in as:</span> <strong id="account-email">-</strong></div>
-                    <div class="stat-row"><span>Plan:</span> <strong id="account-plan">Free</strong></div>
-                    <button class="btn-pill" style="width: 100%; justify-content: center; background: #FFB3BA; color: #902430;" onclick="app.signOutParent()">Log Out</button>
-                </div>
+                <div class="stat-row"><span>Signed in as:</span> <strong id="account-email">-</strong></div>
+                <div class="stat-row"><span>Access:</span> <strong id="account-plan">Full Access ✅</strong></div>
+                <button class="btn-pill" style="width: 100%; justify-content: center; background: #FFB3BA; color: #902430;" onclick="app.signOutParent()">Log Out</button>
             </div>
 
             <div class="panel">
-                <h3>👧 Child Profile & "Grow With Me"</h3>
+                <h3>👧 Active Child Profile & "Grow With Me"</h3>
                 <div class="form-group">
                     <label>Child's Name:</label>
                     <input type="text" id="setting-name" value="Alyssa" onchange="app.updateSettings()">
@@ -1111,6 +1168,9 @@
                         <option value="my">Bahasa Melayu 🇲🇾</option>
                     </select>
                 </div>
+                <button class="btn-pill" style="width: 100%; justify-content: center; background: var(--purple);" onclick="app.goToChildSelect()">
+                    👨‍👩‍👧 Switch / Add Children
+                </button>
             </div>
 
             <div class="panel">
@@ -1132,13 +1192,12 @@
                 <label class="checkbox-group"><input type="checkbox" id="setting-dark" onchange="app.updateSettings()"> Night / Dark Mode</label>
                 <label class="checkbox-group"><input type="checkbox" id="setting-autoplay" checked onchange="app.updateSettings()"> Auto-Play Narration on Tap</label>
 
-                <h3 style="margin-top: 20px;">☁️ Cloud Backup (Firebase)</h3>
-                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">Sync progress securely using Project ID: <strong>nialearn-del</strong></p>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-pill" style="flex:1; justify-content: center; background: var(--blue);" onclick="app.backupToFirebase()">⬆ Backup</button>
-                    <button class="btn-pill" style="flex:1; justify-content: center; background: var(--green);" onclick="app.restoreFromFirebase()">⬇ Restore</button>
-                </div>
-                <button class="btn-pill" style="width: 100%; justify-content: center; margin-top: 10px; background: #FFB3BA; color: #902430;" onclick="app.resetProgress()">⚠️ Reset All Progress</button>
+                <h3 style="margin-top: 20px;">☁️ Cloud Sync</h3>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">
+                    All children's progress under this account syncs to the cloud automatically —
+                    log in on any device to pick up where you left off.
+                </p>
+                <button class="btn-pill" style="width: 100%; justify-content: center; margin-top: 10px; background: #FFB3BA; color: #902430;" onclick="app.resetProgress()">⚠️ Reset This Child's Progress</button>
             </div>
         </div>
     </div>
@@ -1663,41 +1722,208 @@
 
             loadState() {
                 const defaultState = {
+                    // ---- "Active child" mirror fields ----
+                    // All existing flashcard/game/reward code reads these directly
+                    // (this.state.name, .stars, etc). We keep them as-is and just
+                    // copy them in/out of state.children[activeChildId] whenever
+                    // the active child changes. This avoids having to rewrite
+                    // every function that already uses these fields.
                     name: 'Alyssa',
                     ageBand: null, // '2-3' | '3-4' | '4-6' — null means show the Age Pick screen
-                    language: 'en',
                     stars: 0,
                     streak: 1,
                     lastLogin: Date.now(),
                     progress: {},
-                    uid: null,        // Firebase Auth user id, set once parent logs in
-                    email: null,      // Parent's email, set once parent logs in
-                    isPremium: false, // Premium/paid flag (set by future paywall step)
+
+                    // ---- Device-level settings (shared by all children) ----
+                    language: 'en',
                     settings: {
                         tts: true, sfx: true, anim: true, dark: false, autoplay: true
-                    }
+                    },
+
+                    // ---- Parent account (Firebase Auth) ----
+                    uid: null,
+                    email: null,
+                    hasPurchased: false, // One-time purchase flag — true unlocks everything forever
+
+                    // ---- Multi-child support ----
+                    children: {},        // { childId: { name, ageBand, stars, streak, progress, lastLogin } }
+                    activeChildId: null
                 };
                 const saved = localStorage.getItem('nialearn_state');
-                return saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
+                const state = saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
+
+                // One-time migration: older saves had no "children" map at all.
+                // If we find leftover top-level progress but no children yet,
+                // turn that into the first child so nothing gets lost.
+                if (Object.keys(state.children).length === 0 &&
+                    (state.ageBand || state.stars > 0 || Object.keys(state.progress).length > 0)) {
+                    const legacyId = 'child_legacy';
+                    state.children[legacyId] = {
+                        name: state.name, ageBand: state.ageBand, stars: state.stars,
+                        streak: state.streak, progress: state.progress, lastLogin: state.lastLogin
+                    };
+                    state.activeChildId = legacyId;
+                }
+                return state;
+            }
+
+            // Copies the currently-active child's mirror fields (name, stars, etc.)
+            // into state.children[activeChildId], so nothing is lost when switching.
+            mirrorActiveChildFromTop() {
+                if (!this.state.activeChildId) return;
+                this.state.children[this.state.activeChildId] = {
+                    name: this.state.name,
+                    ageBand: this.state.ageBand,
+                    stars: this.state.stars,
+                    streak: this.state.streak,
+                    progress: this.state.progress,
+                    lastLogin: this.state.lastLogin
+                };
+            }
+
+            // Copies one child's saved data back onto the top-level mirror fields
+            // so existing flashcard/game/reward code "just works" on that child.
+            loadActiveChildToTop(childId) {
+                const child = this.state.children[childId];
+                if (!child) return;
+                this.state.activeChildId = childId;
+                this.state.name = child.name;
+                this.state.ageBand = child.ageBand;
+                this.state.stars = child.stars || 0;
+                this.state.streak = child.streak || 1;
+                this.state.progress = child.progress || {};
+                this.state.lastLogin = child.lastLogin || Date.now();
+            }
+
+            addChild(name) {
+                const id = 'child_' + Date.now();
+                this.state.children[id] = {
+                    name: name || 'New Learner', ageBand: null, stars: 0,
+                    streak: 1, progress: {}, lastLogin: Date.now()
+                };
+                this.saveState();
+                return id;
+            }
+
+            deleteChild(childId) {
+                delete this.state.children[childId];
+                if (this.state.activeChildId === childId) this.state.activeChildId = null;
+                this.saveState();
+            }
+
+            // Switches the active child, updates the header/home UI, then routes
+            // to Age Pick (brand-new child) or straight to Home (returning child).
+            selectChild(childId) {
+                this.mirrorActiveChildFromTop();
+                this.loadActiveChildToTop(childId);
+                this.saveState();
+                this.updateLanguageUI();
+                if (!this.state.ageBand) {
+                    this.navigateTo('agepick');
+                } else {
+                    this.navigateTo('home');
+                }
+            }
+
+            goToChildSelect() {
+                this.mirrorActiveChildFromTop();
+                this.saveState();
+                this.navigateTo('childselect');
+            }
+
+            // Renders the list of child profiles on the Child Select screen
+            renderChildSelect() {
+                const list = document.getElementById('childselect-list');
+                list.innerHTML = '';
+                const entries = Object.entries(this.state.children);
+
+                if (entries.length === 0) {
+                    const empty = document.createElement('p');
+                    empty.style.cssText = 'text-align:center; color: var(--text-light); margin-bottom: 15px;';
+                    empty.innerText = "No children yet — add one below to get started!";
+                    list.appendChild(empty);
+                    return;
+                }
+
+                const ageIcons = { '2-3': '👶', '3-4': '🧒', '4-6': '🎓' };
+                entries.forEach(([id, child]) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'list-btn';
+                    const isActive = id === this.state.activeChildId;
+                    const caption = child.ageBand
+                        ? `${child.stars} ⭐ earned`
+                        : 'Tap to set up age group';
+                    btn.innerHTML = `
+                        <div class="list-btn-icon" style="background: var(--yellow);">${ageIcons[child.ageBand] || '🐣'}</div>
+                        <div class="list-btn-text">
+                            <div class="list-btn-title">${child.name}${isActive ? ' (current)' : ''}</div>
+                            <div class="list-btn-caption">${caption}</div>
+                        </div>
+                        <div class="list-btn-arrow">➜</div>
+                    `;
+                    btn.onclick = () => this.selectChild(id);
+                    list.appendChild(btn);
+                });
+            }
+
+            // Reads the "new child's name" input on the Child Select screen and adds them
+            addChildFromInput() {
+                const input = document.getElementById('new-child-name');
+                const name = input.value.trim();
+                if (!name) {
+                    this.audio.playSFX('error');
+                    return;
+                }
+                const id = this.addChild(name);
+                input.value = '';
+                this.selectChild(id); // Jump straight into Age Pick for the new child
             }
 
             saveState() {
+                this.mirrorActiveChildFromTop();
                 localStorage.setItem('nialearn_state', JSON.stringify(this.state));
                 this.updateHeaderStats();
+
+                // Sync the important cloud-shared bits (not device-only settings)
+                if (this.state.uid) {
+                    db.ref(`nialearn_users/${this.state.uid}/children`).set(this.state.children);
+                    db.ref(`nialearn_users/${this.state.uid}/activeChildId`).set(this.state.activeChildId);
+                }
+            }
+
+            // Decides which screen the app should show right now, based on
+            // login state, purchase state, and whether a child is selected.
+            // Called after login/logout, after purchase, and after signup.
+            evaluateAccess() {
+                if (!this.state.uid) {
+                    this.navigateTo('authgate', true);
+                } else if (!this.state.hasPurchased) {
+                    this.navigateTo('paywall', true);
+                } else if (!this.state.activeChildId || !this.state.children[this.state.activeChildId]) {
+                    this.navigateTo('childselect', true);
+                } else {
+                    this.loadActiveChildToTop(this.state.activeChildId);
+                    this.updateLanguageUI();
+                    if (!this.state.ageBand) {
+                        this.navigateTo('agepick', true);
+                    } else {
+                        this.navigateTo('home', true);
+                    }
+                }
             }
 
             initUI() {
                 // Apply theme & language settings
                 if (this.state.settings.dark) document.body.classList.add('dark-mode');
                 this.updateLanguageUI();
-                this.renderHomeGrid();
                 this.updateHeaderStats();
 
-                // Returning users who already picked an age band skip straight to Home
-                // (silent = true avoids trying to play a sound before any user gesture)
-                if (this.state.ageBand) {
-                    this.navigateTo('home', true);
-                }
+                // Which screen to show (login / paywall / pick child / age pick / home)
+                // is decided by evaluateAccess(), triggered once Firebase Auth
+                // reports whether anyone is logged in (see auth.onAuthStateChanged
+                // near the bottom of this script). We don't navigate here because
+                // that check is asynchronous.
 
                 // Check daily streak
                 const oneDay = 86400000;
@@ -1759,6 +1985,8 @@
                 if (screenId === 'leveltopics' && this.currentLevel) this.renderLevelTopics();
                 if (screenId === 'rewards') this.renderRewards();
                 if (screenId === 'parent') this.renderParentDashboard();
+                if (screenId === 'childselect') this.renderChildSelect();
+                if (screenId === 'paywall') this.renderPaywall();
                 if (screenId === 'games') {
                     document.getElementById('game-menu').style.display = 'grid';
                     document.getElementById('game-play-area').style.display = 'none';
@@ -2298,9 +2526,9 @@
 
             // ---- PARENT ACCOUNT (Firebase Auth: sign up / log in / log out) ----
             signUpParent() {
-                const email = document.getElementById('auth-email').value.trim();
-                const password = document.getElementById('auth-password').value;
-                const errEl = document.getElementById('auth-error');
+                const email = document.getElementById('gate-auth-email').value.trim();
+                const password = document.getElementById('gate-auth-password').value;
+                const errEl = document.getElementById('gate-auth-error');
                 errEl.innerText = '';
                 if (!email || !password) {
                     errEl.innerText = 'Please enter an email and password.';
@@ -2308,17 +2536,17 @@
                 }
                 auth.createUserWithEmailAndPassword(email, password)
                     .then(() => {
-                        // Save a starter record for this new account (free plan by default)
+                        // Save a starter record for this new account (not purchased yet)
                         const uid = auth.currentUser.uid;
-                        db.ref(`nialearn_users/${uid}/isPremium`).set(false);
+                        db.ref(`nialearn_users/${uid}/hasPurchased`).set(false);
                     })
                     .catch(err => { errEl.innerText = err.message; });
             }
 
             signInParent() {
-                const email = document.getElementById('auth-email').value.trim();
-                const password = document.getElementById('auth-password').value;
-                const errEl = document.getElementById('auth-error');
+                const email = document.getElementById('gate-auth-email').value.trim();
+                const password = document.getElementById('gate-auth-password').value;
+                const errEl = document.getElementById('gate-auth-error');
                 errEl.innerText = '';
                 if (!email || !password) {
                     errEl.innerText = 'Please enter an email and password.';
@@ -2332,21 +2560,37 @@
                 auth.signOut();
             }
 
-            // Called whenever login state changes (see auth.onAuthStateChanged below)
+            // Called whenever login state changes — keeps the Parent
+            // Dashboard's account panel accurate (email + access status).
             updateAccountUI(user) {
-                const loggedOutEl = document.getElementById('account-logged-out');
-                const loggedInEl = document.getElementById('account-logged-in');
-                if (!loggedOutEl || !loggedInEl) return; // Parent screen not rendered yet
+                const emailEl = document.getElementById('account-email');
+                if (!emailEl) return; // Dashboard not rendered yet
+                emailEl.innerText = user ? user.email : '-';
+                document.getElementById('account-plan').innerText = this.state.hasPurchased ? 'Full Access ✅' : 'Not Purchased';
+            }
 
-                if (user) {
-                    loggedOutEl.style.display = 'none';
-                    loggedInEl.style.display = 'block';
-                    document.getElementById('account-email').innerText = user.email;
-                    document.getElementById('account-plan').innerText = this.state.isPremium ? 'Premium ⭐' : 'Free';
-                } else {
-                    loggedOutEl.style.display = 'block';
-                    loggedInEl.style.display = 'none';
+            // Shows the signed-in email on the paywall screen
+            renderPaywall() {
+                const el = document.getElementById('paywall-email');
+                if (el) el.innerText = (auth.currentUser && auth.currentUser.email) || '-';
+            }
+
+            // Placeholder for now — Step 4 will replace this with a real
+            // ToyyibPay/Stripe payment link. For manual testing today, this
+            // simulates a successful one-time purchase.
+            buyFullAccess() {
+                const confirmed = confirm(
+                    "Payment isn't connected yet.\n\nFor testing, click OK to simulate a successful purchase " +
+                    "(this will be replaced by a real payment page in the next step)."
+                );
+                if (!confirmed) return;
+
+                this.state.hasPurchased = true;
+                if (this.state.uid) {
+                    db.ref(`nialearn_users/${this.state.uid}/hasPurchased`).set(true);
                 }
+                this.saveState();
+                this.evaluateAccess();
             }
 
             renderParentDashboard() {
@@ -2414,42 +2658,12 @@
                 this.renderHomeGrid();
             }
 
-            async backupToFirebase() {
-                try {
-                    const ref = db.ref(`nialearn_users/${this.state.name.toLowerCase()}`);
-                    await ref.set(this.state);
-                    alert("✅ Progress successfully backed up to Firebase Cloud!");
-                } catch (e) {
-                    alert("❌ Firebase Backup Failed. Check internet connection.");
-                    console.error(e);
-                }
-            }
-
-            async restoreFromFirebase() {
-                try {
-                    const ref = db.ref(`nialearn_users/${this.state.name.toLowerCase()}`);
-                    const snapshot = await ref.once('value');
-                    const data = snapshot.val();
-                    if (data) {
-                        this.state = data;
-                        this.saveState();
-                        this.initUI();
-                        this.renderParentDashboard();
-                        alert("✅ Progress restored from Firebase!");
-                    } else {
-                        alert("No backup found for " + this.state.name);
-                    }
-                } catch (e) {
-                    alert("❌ Firebase Restore Failed.");
-                    console.error(e);
-                }
-            }
-
             resetProgress() {
-                if (confirm("Are you sure you want to reset Alyssa's learning progress and stars?")) {
-                    localStorage.removeItem('nialearn_state');
-                    this.state = this.loadState();
-                    this.initUI();
+                if (confirm(`Are you sure you want to reset ${this.state.name}'s learning progress and stars? (This won't affect other children or your account.)`)) {
+                    this.state.stars = 0;
+                    this.state.streak = 1;
+                    this.state.progress = {};
+                    this.saveState();
                     this.renderParentDashboard();
                 }
             }
@@ -2467,33 +2681,54 @@
 
         // Initialize App on Window Load
         let app;
+        let pendingAuthUser; // 'undefined' until Firebase reports the first auth state
+
         window.onload = () => {
             app = new NiaLearnApp();
+            // If Firebase Auth already resolved before the app finished loading,
+            // apply that result now instead of waiting for another event.
+            if (pendingAuthUser !== undefined) applyAuthState(pendingAuthUser);
         };
 
         // ---- FIREBASE AUTH STATE LISTENER ----
         // Fires whenever a parent logs in, signs up, logs out, or the page
-        // reloads while already logged in. Keeps app.state and the account
-        // panel UI in sync with the real Firebase Auth session.
-        auth.onAuthStateChanged(user => {
-            if (!app) return; // Page still loading, nothing to update yet
+        // reloads while already logged in. Drives which screen is shown
+        // (login / paywall / pick child / age pick / home) via evaluateAccess().
+        function applyAuthState(user) {
+            pendingAuthUser = user;
+            if (!app) return; // App still constructing — window.onload will replay this
 
             app.state.uid = user ? user.uid : null;
             app.state.email = user ? user.email : null;
 
             if (user) {
-                // Pull this parent's premium flag from the cloud
-                db.ref(`nialearn_users/${user.uid}/isPremium`).once('value').then(snap => {
-                    app.state.isPremium = snap.val() === true;
+                db.ref(`nialearn_users/${user.uid}`).once('value').then(snapshot => {
+                    const cloudData = snapshot.val() || {};
+                    app.state.hasPurchased = cloudData.hasPurchased === true;
+                    app.state.children = cloudData.children || app.state.children || {};
+                    app.state.activeChildId = cloudData.activeChildId || app.state.activeChildId || null;
                     app.saveState();
                     app.updateAccountUI(user);
+                    app.evaluateAccess();
                 });
             } else {
-                app.state.isPremium = false;
+                // Logged out — clear anything tied to the previous account so
+                // it doesn't leak into whoever logs in next on this device.
+                app.state.hasPurchased = false;
+                app.state.children = {};
+                app.state.activeChildId = null;
+                app.state.name = 'Alyssa';
+                app.state.ageBand = null;
+                app.state.stars = 0;
+                app.state.streak = 1;
+                app.state.progress = {};
                 app.saveState();
                 app.updateAccountUI(null);
+                app.evaluateAccess();
             }
-        });
+        }
+
+        auth.onAuthStateChanged(applyAuthState);
     </script>
 </body>
 </html>
